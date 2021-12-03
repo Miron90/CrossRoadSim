@@ -16,7 +16,13 @@ public class AWT {
     MyFrame myFrame;
     Map<Integer, Color> trafficColor=new HashMap<>();
 
-    ArrayList<Car> cars = new ArrayList<>();
+    ArrayList<Car> carsOnRoad1 = new ArrayList<>();
+    ArrayList<Car> carsOnRoad2 = new ArrayList<>();
+    ArrayList<Car> carsOnRoad3 = new ArrayList<>();
+    ArrayList<Car> carsOnRoad4 = new ArrayList<>();
+
+    ArrayList<Integer> carsOnRoad = new ArrayList<>();
+
 
     public AWT(){
         trafficColor.put(1,Color.GREEN);
@@ -36,8 +42,17 @@ public class AWT {
     int pivot=10;
 
     public void drawCar(ArrayList<Car> cars) {
-        this.cars=cars;
+        for (Car car: cars) {
+            if(car.getRoadId()==0 && !carsOnRoad1.contains(car))carsOnRoad1.add(car);
+            else if (car.getRoadId()==1&& !carsOnRoad2.contains(car))carsOnRoad2.add(car);
+            else if (car.getRoadId()==2&& !carsOnRoad3.contains(car))carsOnRoad3.add(car);
+            else if (car.getRoadId()==3&& !carsOnRoad4.contains(car))carsOnRoad4.add(car);
 
+        }
+    }
+
+    public void setCarsOnRoad(ArrayList<Integer> carOnRoadList) {
+        this.carsOnRoad=carOnRoadList;
     }
 
 
@@ -101,8 +116,18 @@ public class AWT {
             for(int i=0;i<=trafficColor.size();i++) {
                 drawTrafficLight(i,g);
             }
-            for(int i=0;i<cars.size();i++) {
-                drawCar(g, cars.get(i));
+            System.out.println(carsOnRoad1.size());
+            for(int i=0;i<carsOnRoad1.size();i++) {
+                drawCar(g, carsOnRoad1.get(i),i);
+            }
+            for(int i=0;i<carsOnRoad2.size();i++) {
+                drawCar(g, carsOnRoad2.get(i),i);
+            }
+            for(int i=0;i<carsOnRoad3.size();i++) {
+                drawCar(g, carsOnRoad3.get(i),i);
+            }
+            for(int i=0;i<carsOnRoad4.size();i++) {
+                drawCar(g, carsOnRoad4.get(i),i);
             }
         }
 
@@ -215,16 +240,90 @@ public class AWT {
 
 
 
-        public void drawCar(Graphics g, Car car) {
-            g.setColor(Color.BLACK);
-            g.fillOval(car.getCurrentx()-5, car.getCurrenty(),10,10);
-            g.fillOval(car.getCurrentx()-5, car.getCurrenty()+40,10,10);
-            g.fillOval(car.getCurrentx()+35, car.getCurrenty(),10,10);
-            g.fillOval(car.getCurrentx()+35, car.getCurrenty()+40,10,10);
-            g.setColor(Color.BLUE);
-            g.fillRect(car.getCurrentx(), car.getCurrenty(), 40,50);
+        public void drawCar(Graphics g, Car car, int carOfNumber) {
             //car.nowx+=1;
-            car.setCurrenty(car.getCurrenty()+3);
+            if(car.isOnTraffic()){
+
+            }else {
+                switch (car.getRoadId()){
+                    case 0:
+                        g.setColor(Color.BLACK);
+                        g.fillOval(car.getCurrentx()-5, car.getCurrenty(),10,10);
+                        g.fillOval(car.getCurrentx()-5, car.getCurrenty()+40,10,10);
+                        g.fillOval(car.getCurrentx()+35, car.getCurrenty(),10,10);
+                        g.fillOval(car.getCurrentx()+35, car.getCurrenty()+40,10,10);
+                        g.setColor(Color.BLUE);
+                        g.fillRect(car.getCurrentx(), car.getCurrenty(), 40,50);
+                        g.setColor(Color.YELLOW);
+                        g.fillRect(car.getCurrentx()+10, car.getCurrenty()+30, 20,10);
+                        g.setColor(Color.BLACK);
+                        if(carOfNumber!=0 && carsOnRoad1.get(carOfNumber-1).getCurrenty()>carsOnRoad1.get(carOfNumber).getCurrenty()+50+30){
+                            car.setCurrenty(car.getCurrenty()+3);
+                        }else if (carOfNumber==0) car.setCurrenty(car.getCurrenty()+3);
+                        if(car.getCurrenty()>=car.getTrafficy()){
+                            car.setOnTraffic(true);
+                        }
+                        break;
+                    case 1:
+                        g.setColor(Color.BLACK);
+                        g.fillOval(car.getCurrentx()+5, car.getCurrenty()-5,10,10);
+                        g.fillOval(car.getCurrentx()+35, car.getCurrenty()-5,10,10);
+                        g.fillOval(car.getCurrentx()+5, car.getCurrenty()+35,10,10);
+                        g.fillOval(car.getCurrentx()+35, car.getCurrenty()+35,10,10);
+                        g.setColor(Color.BLUE);
+                        g.fillRect(car.getCurrentx(), car.getCurrenty(), 50,40);
+                        g.setColor(Color.YELLOW);
+                        g.fillRect(car.getCurrentx()+10, car.getCurrenty()+10, 10,20);
+                        g.setColor(Color.BLACK);
+                        if(carOfNumber!=0 && carsOnRoad2.get(carOfNumber-1).getCurrentx()<carsOnRoad2.get(carOfNumber).getCurrentx()-50-30){
+                            car.setCurrentx(car.getCurrentx()-3);
+                        }else if (carOfNumber==0) car.setCurrentx(car.getCurrentx()-3);
+
+                        if(car.getCurrentx()<=car.getTrafficx()){
+                            car.setOnTraffic(true);
+                        }
+                        break;
+                    case 2:
+                        g.setColor(Color.BLACK);
+                        g.fillOval(car.getCurrentx()-5, car.getCurrenty()+5,10,10);
+                        g.fillOval(car.getCurrentx()-5, car.getCurrenty()+40,10,10);
+                        g.fillOval(car.getCurrentx()+35, car.getCurrenty()+5,10,10);
+                        g.fillOval(car.getCurrentx()+35, car.getCurrenty()+40,10,10);
+                        g.setColor(Color.BLUE);
+                        g.fillRect(car.getCurrentx(), car.getCurrenty(), 40,50);
+                        g.setColor(Color.YELLOW);
+                        g.fillRect(car.getCurrentx()+10, car.getCurrenty()+10, 20,10);
+                        g.setColor(Color.BLACK);
+                        if(carOfNumber!=0 && carsOnRoad3.get(carOfNumber-1).getCurrenty()<carsOnRoad3.get(carOfNumber).getCurrenty()-30-50){
+                            car.setCurrenty(car.getCurrenty()-3);
+                        }else if (carOfNumber==0) car.setCurrenty(car.getCurrenty()-3);
+
+                        if(car.getCurrenty()<=car.getTrafficy()){
+                            car.setOnTraffic(true);
+                        }
+                        break;
+                    case 3:
+                        g.setColor(Color.BLACK);
+                        g.fillOval(car.getCurrentx()+5, car.getCurrenty()-5,10,10);
+                        g.fillOval(car.getCurrentx()+5, car.getCurrenty()+35,10,10);
+                        g.fillOval(car.getCurrentx()+40, car.getCurrenty()-5,10,10);
+                        g.fillOval(car.getCurrentx()+40, car.getCurrenty()+35,10,10);
+                        g.setColor(Color.BLUE);
+                        g.fillRect(car.getCurrentx(), car.getCurrenty(), 50,40);
+                        g.setColor(Color.YELLOW);
+                        g.fillRect(car.getCurrentx()+30, car.getCurrenty()+10, 10,20);
+                        g.setColor(Color.BLACK);
+                        if(carOfNumber!=0 && carsOnRoad4.get(carOfNumber-1).getCurrentx()>carsOnRoad4.get(carOfNumber).getCurrentx()+50+30){
+                            car.setCurrentx(car.getCurrentx()+3);
+                        }else if (carOfNumber==0) car.setCurrentx(car.getCurrentx()+3);
+
+                        if(car.getCurrentx()>=car.getTrafficx()){
+                            car.setOnTraffic(true);
+                        }
+                        break;
+                }
+            }
+
         }
     }
 }

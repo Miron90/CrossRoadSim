@@ -251,7 +251,8 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
                 }
 
             }
-        federate.carList.add(new Car(carId.getValue(), roadId.getValue(),roadToGoId.getValue()));
+            federate.carList.add(new Car(carId.getValue(), roadId.getValue(),roadToGoId.getValue(), federate.carOnRoadList.get(roadId.getValue())));
+            federate.carOnRoadList.set(roadId.getValue(),federate.carOnRoadList.get(roadId.getValue())+1);
             builder.append("\n");
         }
 

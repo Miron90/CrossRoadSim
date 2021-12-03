@@ -47,6 +47,7 @@ public class GUIFederate extends BaseFederate{
 
     ArrayList<Road> roadList = new ArrayList<>();
     ArrayList<Car> carList = new ArrayList<>();
+    ArrayList<Integer> carOnRoadList = new ArrayList<>();
 
 
 
@@ -159,7 +160,9 @@ public class GUIFederate extends BaseFederate{
         publishAndSubscribe();
         log( "Published and Subscribed" );
         AWT Gui = new AWT();
-
+        for (int i=0; i<4;i++){
+            carOnRoadList.add(0);
+        }
         while( fedamb.federateTime<SIM_TIME )
         {
             for (int i=0; i<roadList.size();i++){
@@ -170,6 +173,7 @@ public class GUIFederate extends BaseFederate{
                 }
             }
             Gui.drawCar(carList);
+            Gui.setCarsOnRoad(carOnRoadList);
             Gui.myFrame.myCanvas.repaint();
             log( "roadList size "+roadList.size() );
             double minTime=1;

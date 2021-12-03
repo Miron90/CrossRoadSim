@@ -13,14 +13,20 @@ public class Car {
     private int roadToGo;
     private boolean onTraffic = false;
 
-    private int initx;
-    private int inity;
+    private boolean afterTraffic = false;
+
+    private boolean afterCrossRoad = false;
+
     private int endx;
     private int endy;
     private int currentx;
     private int currenty;
     private int trafficx;
     private int trafficy;
+    private int beforeNextCarx;
+    private int beforeNextCary;
+
+    private int carOnThisRoad;
 
     public Car(int carId, ObjectInstanceHandle carObjectId, int roadId) {
         this.carId = carId;
@@ -66,71 +72,72 @@ public class Car {
         this.roadId = roadId;
     }
 
-    public Car(int carId, int roadId, int roadToGo) {
+    public Car(int carId, int roadId, int roadToGo, int carOnThisRoad) {
         this.carId = carId;
         this.roadId = roadId;
         this.roadToGo = roadToGo;
+        this.carOnThisRoad = carOnThisRoad;
         switch(this.roadId){
             case 0:
-                currentx=610;
-                currenty=0;
-                trafficx=initx;
-                trafficy=inity+370;
+                currentx=535;
+                currenty=-60;
+                trafficx=currentx;
+                trafficy=currenty+520;
                 break;
             case 1:
-                currentx=610;
-                currenty=0;
-                trafficx=initx;
-                trafficy=inity+370;
+                currentx=1260;
+                currenty=535;
+                trafficx=currentx-580;
+                trafficy=currenty;
                 break;
             case 2:
                 currentx=610;
-                currenty=0;
-                trafficx=initx;
-                trafficy=inity+370;
+                currenty=1260;
+                trafficx=currentx;
+                trafficy=currenty-580;
                 break;
             case 3:
-                currentx=610;
-                currenty=0;
-                trafficx=initx;
-                trafficy=inity+370;
+                currentx=-60;
+                currenty=610;
+                trafficx=currentx+520;
+                trafficy=currenty;
                 break;
 
         }
         switch(roadToGo){
             case 0:
-                endx = 610;
-                endy=1000;
+                endx = 535;
+                endy = 1200;
                 break;
             case 1:
                 endx = 610;
-                endy=1000;
+                endy=1200;
                 break;
             case 2:
                 endx = 610;
-                endy=1000;
+                endy=1200;
                 break;
             case 3:
                 endx = 610;
-                endy=1000;
+                endy=1200;
                 break;
         }
     }
 
-    public int getInitx() {
-        return initx;
+    public boolean isOnTraffic() {
+        return onTraffic;
     }
 
-    public void setInitx(int initx) {
-        this.initx = initx;
+    public void setOnTraffic(boolean onTraffic) {
+        this.onTraffic = onTraffic;
     }
 
-    public int getInity() {
-        return inity;
+    public int getCarOnThisRoad() {
+        return carOnThisRoad;
     }
 
-    public void setInity(int inity) {
-        this.inity = inity;
+    public void setCarOnThisRoad(int carOnThisRoad) {
+        this.carOnThisRoad = carOnThisRoad;
     }
 
     public int getEndx() {
@@ -163,5 +170,21 @@ public class Car {
 
     public void setCurrenty(int currenty) {
         this.currenty = currenty;
+    }
+
+    public int getTrafficx() {
+        return trafficx;
+    }
+
+    public void setTrafficx(int trafficx) {
+        this.trafficx = trafficx;
+    }
+
+    public int getTrafficy() {
+        return trafficy;
+    }
+
+    public void setTrafficy(int trafficy) {
+        this.trafficy = trafficy;
     }
 }

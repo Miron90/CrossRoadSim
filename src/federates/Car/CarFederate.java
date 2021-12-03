@@ -181,7 +181,7 @@ public class CarFederate extends BaseFederate{
             double minTime=INFINITY;
 
             if(minTime==INFINITY | minTime>10) minTime=randomTime();
-            advanceTime(randomTime());
+            advanceTime(3);
             log( "Time Advanced to " + fedamb.federateTime );
         }
 
@@ -227,7 +227,7 @@ public class CarFederate extends BaseFederate{
         attributes.put( this.carRoadIdHandle, carRoadId.toByteArray() );
 
         HLAinteger32BE carRoadToGoId = encoderFactory.createHLAinteger32BE( car.getRoadToGo() );
-        attributes.put( this.carRoadIdHandle, carRoadToGoId.toByteArray() );
+        attributes.put( this.carRoadToGoId, carRoadToGoId.toByteArray() );
 
         rtiamb.updateAttributeValues( car.getCarObjectId(), attributes, generateTag() );
     }
