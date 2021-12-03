@@ -12,11 +12,11 @@
 		<objectClass>
 			<name>HLAobjectRoot</name>
 			<objectClass>
-				<name>Warehouse</name>
+				<name>Car</name>
 				<sharing>PublishSubscribe</sharing>
-				<semantics>Warehouse for products</semantics>
+				<semantics>Normal Car</semantics>
 				<attribute>
-					<name>warehouseId</name>
+					<name>carId</name>
 					<dataType>HLAinteger32BE</dataType>
 					<updateType>Conditional</updateType>
 					<updateCondition>On Change</updateCondition>
@@ -24,48 +24,15 @@
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
 					<order>Receive</order>
-					<semantics>id of a warehouse</semantics>
-				</attribute>
-				<attribute>
-					<name>sausages</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Number of sausages in warehouse</semantics>
-				</attribute>
-				<attribute>
-					<name>cheese</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Number of cheese in warehouse</semantics>
-				</attribute>
-				<attribute>
-					<name>beef</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Number of beef in warehouse</semantics>
+					<semantics>id of a car</semantics>
 				</attribute>
 			</objectClass>
 			<objectClass>
-				<name>Queue</name>
+				<name>Road</name>
 				<sharing>PublishSubscribe</sharing>
-				<semantics>Queue for customers</semantics>
+				<semantics>Road for cars</semantics>
 				<attribute>
-					<name>queueId</name>
+					<name>roadId</name>
 					<dataType>HLAinteger32BE</dataType>
 					<updateType>Conditional</updateType>
 					<updateCondition>On Change</updateCondition>
@@ -73,29 +40,18 @@
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
 					<order>Receive</order>
-					<semantics>Id of the queue</semantics>
+					<semantics>Id of the road</semantics>
 				</attribute>
 				<attribute>
-					<name>queueLength</name>
-					<dataType>HLAinteger32BE</dataType>
+					<name>light</name>
+					<dataType>HLA1516eBoolean</dataType>
 					<updateType>Conditional</updateType>
 					<updateCondition>On Change</updateCondition>
 					<ownership>Divest</ownership>
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
 					<order>Receive</order>
-					<semantics>Length of the queue</semantics>
-				</attribute>
-				<attribute>
-					<name>firstCustomerId</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Id of the first customer in queue</semantics>
+					<semantics>Attribute that tells if light should be turned on or off</semantics>
 				</attribute>
 			</objectClass>
 			<objectClass>
@@ -182,7 +138,7 @@
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
 					<order>Receive</order>
-					<semantics>Id of the GUI</semantics>
+					<semantics>Id of the Road</semantics>
 				</attribute>
 				<attribute>
 					<name>queueId</name>
@@ -193,7 +149,7 @@
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
 					<order>Receive</order>
-					<semantics>LId of the queue that belongs to GUI</semantics>
+					<semantics>LId of the queue that belongs to Road</semantics>
 				</attribute>
 				<attribute>
 					<name>quantityOfServed</name>
@@ -204,7 +160,7 @@
 					<sharing>PublishSubscribe</sharing>
 					<transportation>HLAreliable</transportation>
 					<order>Receive</order>
-					<semantics>Number for statistics indicating how amny customer have the GUI served</semantics>
+					<semantics>Number for statistics indicating how amny customer have the Road served</semantics>
 				</attribute>
 			</objectClass>
 		</objectClass>

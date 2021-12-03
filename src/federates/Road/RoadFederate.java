@@ -1,31 +1,27 @@
-package federates.GUI;
+package federates.Road;
 
 
-import federates.Road.Road;
 import helpers.BaseFederate;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.EncoderFactory;
+import hla.rti1516e.encoding.HLAboolean;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.*;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
 
-import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import static helpers.Config.*;
 
-public class GUIFederate extends BaseFederate{
+public class RoadFederate extends BaseFederate{
 //----------------------------------------------------------
     //                    STATIC VARIABLES
     //----------------------------------------------------------
-    /** The number of times we will update our attributes and send an interaction */
-    public static final int ITERATIONS = 20;
 
     /** The sync point all federates will sync up on before starting */
     public static final String READY_TO_RUN = "ReadyToRun";
@@ -34,7 +30,7 @@ public class GUIFederate extends BaseFederate{
     //                   INSTANCE VARIABLES
     //----------------------------------------------------------
     private RTIambassador rtiamb;
-    private GUIFederateAmbassador fedamb;
+    private RoadFederateAmbassador fedamb;
     private HLAfloat64TimeFactory timeFactory;
     protected EncoderFactory encoderFactory;
 
@@ -43,8 +39,6 @@ public class GUIFederate extends BaseFederate{
     protected AttributeHandle roadLightHandle;
 
     ArrayList<Road> roadList = new ArrayList<>();
-
-
 
     ///////////////////////////////////////////////////////////////////////////
     ////////////////////////// Main Simulation Method /////////////////////////
@@ -56,7 +50,8 @@ public class GUIFederate extends BaseFederate{
      */
     public void runFederate( String federateName ) throws Exception
     {
-        who = "GUI";
+        who = "Road";
+
         /////////////////////////////////////////////////
         // 1 & 2. create the RTIambassador and Connect //
         /////////////////////////////////////////////////
@@ -66,7 +61,7 @@ public class GUIFederate extends BaseFederate{
 
         // connect
         log( "Connecting..." );
-        fedamb = new GUIFederateAmbassador( this );
+        fedamb = new RoadFederateAmbassador( this );
         rtiamb.connect( fedamb, CallbackModel.HLA_EVOKED );
 
         //////////////////////////////
@@ -99,7 +94,7 @@ public class GUIFederate extends BaseFederate{
         // 4. join the federation //
         ////////////////////////////
         rtiamb.joinFederationExecution( federateName,            // name for the federate
-                "GUI",   // federate type
+                "road",   // federate type
                 "CrossRoadFederation"     // name of federation
         );           // modules we want to add
 
@@ -154,7 +149,26 @@ public class GUIFederate extends BaseFederate{
         // produce, and all the data we want to know about
         publishAndSubscribe();
         log( "Published and Subscribed" );
-        AWT Gui = new AWT();
+        /////////////////////////////////////
+        // 9. register an object to update //
+        /////////////////////////////////////
+        /////////////////////////////////////
+        // 10. do the main simulation loop //
+        /////////////////////////////////////
+        // here is where we do the meat of our work. in each iteration, we will
+        // update the attribute values of the object we registered, and will
+        // send an interaction.
+
+        for (int i=0;i<4;i++){
+            ObjectInstanceHandle roadObjectHandle = rtiamb.registerObjectInstance(roadHandle);
+            if(i%2==1) {
+                roadList.add(new Road(roadObjectHandle, i, true));
+            }else{
+                roadList.add(new Road(roadObjectHandle, i, false));
+            }
+            updateRoad(roadList.get(i));
+            log("Registered Queue, handle=" + roadObjectHandle);
+        }
 
         while( fedamb.federateTime<SIM_TIME )
         {
@@ -196,8 +210,6 @@ public class GUIFederate extends BaseFederate{
     }
 
 
-
-
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////// Helper Methods //////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -209,6 +221,18 @@ public class GUIFederate extends BaseFederate{
     {
         if(fedamb!=null) System.out.println( "time: "+fedamb.federateTime+" | "+who + message );
         else System.out.println( who + message );
+    }
+
+    protected void updateRoad(Road road) throws NotConnected, FederateNotExecutionMember, ObjectInstanceNotKnown, RestoreInProgress, AttributeNotOwned, AttributeNotDefined, SaveInProgress, RTIinternalError {
+        AttributeHandleValueMap attributes = rtiamb.getAttributeHandleValueMapFactory().create(2);
+
+        HLAinteger32BE roadId = encoderFactory.createHLAinteger32BE( road.getRoadId());
+        attributes.put( this.roadIdHandle, roadId.toByteArray() );
+
+        HLAboolean light = encoderFactory.createHLAboolean( road.isLight() );
+        attributes.put( this.roadLightHandle, light.toByteArray() );
+
+        rtiamb.updateAttributeValues( road.getRoadObjectId(), attributes, generateTag() );
     }
 
     private void enableTimePolicy() throws Exception
@@ -254,12 +278,11 @@ public class GUIFederate extends BaseFederate{
         this.roadIdHandle = rtiamb.getAttributeHandle(this.roadHandle,"roadId");
         this.roadLightHandle = rtiamb.getAttributeHandle(this.roadHandle,"light");
 
-        AttributeHandleSet roadAttributes = rtiamb.getAttributeHandleSetFactory().create();
-        roadAttributes.add( this.roadIdHandle );
-        roadAttributes.add( this.roadLightHandle );
+        AttributeHandleSet attributes = rtiamb.getAttributeHandleSetFactory().create();
+        attributes.add( this.roadIdHandle );
+        attributes.add( this.roadLightHandle );
 
-        rtiamb.subscribeObjectClassAttributes( this.roadHandle, roadAttributes );
-
+        rtiamb.publishObjectClassAttributes( this.roadHandle, attributes );
     }
 
     /**
@@ -295,7 +318,7 @@ public class GUIFederate extends BaseFederate{
     public static void main( String[] args )
     {
         // get a federate name, use "exampleFederate" as default
-        String federateName = "GUI";
+        String federateName = "cash";
         if( args.length != 0 )
         {
             federateName = args[0];
@@ -304,7 +327,7 @@ public class GUIFederate extends BaseFederate{
         try
         {
             // run the example federate
-            new GUIFederate().runFederate( federateName );
+            new RoadFederate().runFederate( federateName );
         }
         catch( Exception rtie )
         {

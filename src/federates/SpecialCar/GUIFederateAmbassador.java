@@ -1,16 +1,18 @@
-package federates.GUI;
+package federates.SpecialCar;
 
-import federates.Road.Road;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.DecoderException;
+import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.FederateInternalError;
 import hla.rti1516e.time.HLAfloat64Time;
-import org.portico.impl.hla1516e.types.encoding.HLA1516eBoolean;
+import org.portico.impl.hla1516e.types.encoding.HLA1516eFloat32BE;
 import org.portico.impl.hla1516e.types.encoding.HLA1516eInteger32BE;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GUIFederateAmbassador extends NullFederateAmbassador {
 
@@ -36,7 +38,8 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
 
     protected boolean isRunning       = true;
 
-    List<ObjectInstanceHandle> roadList = new ArrayList<>();
+    List<ObjectInstanceHandle> queueIdList = new ArrayList<>();
+    List<ObjectInstanceHandle> customerIdList = new ArrayList<>();
 
     //----------------------------------------------------------
     //                      CONSTRUCTORS
@@ -75,7 +78,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     public void announceSynchronizationPoint( String label, byte[] tag )
     {
         log( "Synchronization point announced: " + label );
-        if( label.equals(GUIFederate.READY_TO_RUN) )
+        //if( label.equals(WarehouseFederate.READY_TO_RUN) )
             this.isAnnounced = true;
     }
 
@@ -83,7 +86,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     public void federationSynchronized( String label, FederateHandleSet failed )
     {
         log( "Federation Synchronized: " + label );
-        if( label.equals(GUIFederate.READY_TO_RUN) )
+        //if( label.equals(WarehouseFederate.READY_TO_RUN) )
             this.isReadyToRun = true;
     }
 
@@ -119,8 +122,10 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     {
         log( "Discoverd Object: handle=" + theObject + ", classHandle=" +
                 theObjectClass + ", name=" + objectName );
-        if(federate.roadHandle.equals(theObjectClass))
-            roadList.add(theObject);
+        if(federate.queueHandle.equals(theObjectClass))
+            queueIdList.add(theObject);
+        else if(federate.customerHandle.equals(theObjectClass))
+            customerIdList.add(theObject);
     }
 
     @Override
@@ -169,35 +174,122 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
         // print the attribute information
         builder.append( ", attributeCount=" + theAttributes.size() );
         builder.append( "\n" );
-        if(roadList.contains(theObject)){
+        if(queueIdList.contains(theObject)){
+            HLAinteger32BE queueId = new HLA1516eInteger32BE();
+            HLAinteger32BE queueLength = new HLA1516eInteger32BE();
+            HLAinteger32BE firstCutomerId = new HLA1516eInteger32BE();
             for( AttributeHandle attributeHandle : theAttributes.keySet() ) {
                 // print the attibute handle
                 builder.append("\tattributeHandle=").append(attributeHandle);
-                HLAinteger32BE roadId = new HLA1516eInteger32BE();
-                HLA1516eBoolean light = new HLA1516eBoolean();
-                if (attributeHandle.equals(federate.roadIdHandle)) {
-                    builder.append(" (roadId)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        roadId.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(roadId.getValue());
 
-                } else if (attributeHandle.equals(federate.roadLightHandle)) {
-                    builder.append(" (light)    ");
+                if (attributeHandle.equals(federate.queueIdHandle)) {
+                    builder.append(" (QueueId)    ");
                     builder.append(", attributeValue=");
                     try {
-                        light.decode(theAttributes.get(attributeHandle));
+                        queueId.decode(theAttributes.get(attributeHandle));
                     } catch (DecoderException e) {
                         e.printStackTrace();
                     }
-                    builder.append(light.getValue());
+                    builder.append(queueId.getValue());
+                } else if (attributeHandle.equals(federate.queueLengthHandle)) {
+                    builder.append(" (QueueLength)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        queueLength.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(queueLength.getValue());
+                } else if (attributeHandle.equals(federate.firstCustomerIdHandle)) {
+                    builder.append(" (FirstCustomerId)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        firstCutomerId.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(firstCutomerId.getValue());
                 }
-                federate.roadList.add(new Road(roadId.getValue(), light.getValue()));
+
+
+
                 builder.append("\n");
             }
+
+        }else if(customerIdList.contains(theObject)){
+            HLA1516eInteger32BE customerId=new HLA1516eInteger32BE();
+            HLA1516eInteger32BE sausagesQuantity=new HLA1516eInteger32BE();
+            HLA1516eInteger32BE cheeseQuantity=new HLA1516eInteger32BE();
+            HLA1516eInteger32BE beefQuantity=new HLA1516eInteger32BE();
+            HLAfloat32BE queueEnterTime=new HLA1516eFloat32BE();
+            HLAfloat32BE queueLeftTime=new HLA1516eFloat32BE();
+            for( AttributeHandle attributeHandle : theAttributes.keySet() ) {
+                // print the attibute handle
+                builder.append("\tattributeHandle=").append(attributeHandle);
+
+                if (attributeHandle.equals(federate.customerIdHandle)) {
+                    builder.append(" (CustomerId)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        customerId.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(customerId.getValue());
+                } else if (attributeHandle.equals(federate.sausagesHandle)) {
+                    builder.append(" (SausagesQuantity)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        sausagesQuantity.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(sausagesQuantity.getValue());
+                } else if (attributeHandle.equals(federate.cheesehandle)) {
+                    builder.append(" (CheeseQuantity)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        cheeseQuantity.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(cheeseQuantity.getValue());
+                } else if (attributeHandle.equals(federate.beefHandle)) {
+                    builder.append(" (BeefQuantity)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        beefQuantity.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(beefQuantity.getValue());
+                } else if (attributeHandle.equals(federate.queueEnterTimeHandle)) {
+                    builder.append(" (QueueEnterTime)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        queueEnterTime.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(queueEnterTime.getValue());
+                } else if (attributeHandle.equals(federate.queueLeftTimeHandle)) {
+                    builder.append(" (QueueLeftTime)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        queueLeftTime.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(queueLeftTime.getValue());
+                }
+                builder.append("\n");
+            }
+            Map<String,Integer> products = new HashMap<>();
+            products.put("sausages",sausagesQuantity.getValue());
+            products.put("cheese",cheeseQuantity.getValue());
+            products.put("beef",beefQuantity.getValue());
+            boolean exists=false;
+            int id=-1;
 
         }
 

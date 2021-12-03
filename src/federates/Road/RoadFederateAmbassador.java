@@ -1,18 +1,20 @@
-package federates.GUI;
+package federates.Road;
 
-import federates.Road.Road;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.DecoderException;
+import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.FederateInternalError;
 import hla.rti1516e.time.HLAfloat64Time;
-import org.portico.impl.hla1516e.types.encoding.HLA1516eBoolean;
+import org.portico.impl.hla1516e.types.encoding.HLA1516eFloat32BE;
 import org.portico.impl.hla1516e.types.encoding.HLA1516eInteger32BE;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class GUIFederateAmbassador extends NullFederateAmbassador {
+public class RoadFederateAmbassador extends NullFederateAmbassador {
 
     //----------------------------------------------------------
     //                    STATIC VARIABLES
@@ -21,7 +23,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     //----------------------------------------------------------
     //                   INSTANCE VARIABLES
     //----------------------------------------------------------
-    private GUIFederate federate;
+    private RoadFederate federate;
 
     // these variables are accessible in the package
     protected double federateTime        = 0.0;
@@ -36,13 +38,11 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
 
     protected boolean isRunning       = true;
 
-    List<ObjectInstanceHandle> roadList = new ArrayList<>();
-
     //----------------------------------------------------------
     //                      CONSTRUCTORS
     //----------------------------------------------------------
 
-    public GUIFederateAmbassador(GUIFederate federate )
+    public RoadFederateAmbassador(RoadFederate federate )
     {
         this.federate = federate;
     }
@@ -75,7 +75,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     public void announceSynchronizationPoint( String label, byte[] tag )
     {
         log( "Synchronization point announced: " + label );
-        if( label.equals(GUIFederate.READY_TO_RUN) )
+        //if( label.equals(WarehouseFederate.READY_TO_RUN) )
             this.isAnnounced = true;
     }
 
@@ -83,7 +83,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     public void federationSynchronized( String label, FederateHandleSet failed )
     {
         log( "Federation Synchronized: " + label );
-        if( label.equals(GUIFederate.READY_TO_RUN) )
+        //if( label.equals(WarehouseFederate.READY_TO_RUN) )
             this.isReadyToRun = true;
     }
 
@@ -119,8 +119,10 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     {
         log( "Discoverd Object: handle=" + theObject + ", classHandle=" +
                 theObjectClass + ", name=" + objectName );
-        if(federate.roadHandle.equals(theObjectClass))
-            roadList.add(theObject);
+//        if(federate.queueHandle.equals(theObjectClass))
+//            queueIdList.add(theObject);
+//        else if(federate.customerHandle.equals(theObjectClass))
+//            customerIdList.add(theObject);
     }
 
     @Override
@@ -169,37 +171,6 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
         // print the attribute information
         builder.append( ", attributeCount=" + theAttributes.size() );
         builder.append( "\n" );
-        if(roadList.contains(theObject)){
-            for( AttributeHandle attributeHandle : theAttributes.keySet() ) {
-                // print the attibute handle
-                builder.append("\tattributeHandle=").append(attributeHandle);
-                HLAinteger32BE roadId = new HLA1516eInteger32BE();
-                HLA1516eBoolean light = new HLA1516eBoolean();
-                if (attributeHandle.equals(federate.roadIdHandle)) {
-                    builder.append(" (roadId)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        roadId.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(roadId.getValue());
-
-                } else if (attributeHandle.equals(federate.roadLightHandle)) {
-                    builder.append(" (light)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        light.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(light.getValue());
-                }
-                federate.roadList.add(new Road(roadId.getValue(), light.getValue()));
-                builder.append("\n");
-            }
-
-        }
 
         log( builder.toString() );
     }
