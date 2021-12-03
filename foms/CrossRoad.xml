@@ -26,6 +26,28 @@
 					<order>Receive</order>
 					<semantics>id of a car</semantics>
 				</attribute>
+				<attribute>
+					<name>roadId</name>
+					<dataType>HLAinteger32BE</dataType>
+					<updateType>Conditional</updateType>
+					<updateCondition>On Change</updateCondition>
+					<ownership>Divest</ownership>
+					<sharing>PublishSubscribe</sharing>
+					<transportation>HLAreliable</transportation>
+					<order>Receive</order>
+					<semantics>id of a road</semantics>
+				</attribute>
+				<attribute>
+					<name>roadToGo</name>
+					<dataType>HLAinteger32BE</dataType>
+					<updateType>Conditional</updateType>
+					<updateCondition>On Change</updateCondition>
+					<ownership>Divest</ownership>
+					<sharing>PublishSubscribe</sharing>
+					<transportation>HLAreliable</transportation>
+					<order>Receive</order>
+					<semantics>id of a road that car want to go</semantics>
+				</attribute>
 			</objectClass>
 			<objectClass>
 				<name>Road</name>

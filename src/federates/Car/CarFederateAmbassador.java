@@ -1,19 +1,20 @@
-package federates.GUI;
+package federates.Car;
 
-import federates.Car.Car;
-import federates.Road.Road;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.DecoderException;
+import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.FederateInternalError;
 import hla.rti1516e.time.HLAfloat64Time;
-import org.portico.impl.hla1516e.types.encoding.HLA1516eBoolean;
+import org.portico.impl.hla1516e.types.encoding.HLA1516eFloat32BE;
 import org.portico.impl.hla1516e.types.encoding.HLA1516eInteger32BE;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class GUIFederateAmbassador extends NullFederateAmbassador {
+public class CarFederateAmbassador extends NullFederateAmbassador {
 
     //----------------------------------------------------------
     //                    STATIC VARIABLES
@@ -22,7 +23,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     //----------------------------------------------------------
     //                   INSTANCE VARIABLES
     //----------------------------------------------------------
-    private GUIFederate federate;
+    private CarFederate federate;
 
     // these variables are accessible in the package
     protected double federateTime        = 0.0;
@@ -37,14 +38,12 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
 
     protected boolean isRunning       = true;
 
-    List<ObjectInstanceHandle> roadList = new ArrayList<>();
-    List<ObjectInstanceHandle> carList = new ArrayList<>();
 
     //----------------------------------------------------------
     //                      CONSTRUCTORS
     //----------------------------------------------------------
 
-    public GUIFederateAmbassador(GUIFederate federate )
+    public CarFederateAmbassador(CarFederate federate )
     {
         this.federate = federate;
     }
@@ -77,7 +76,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     public void announceSynchronizationPoint( String label, byte[] tag )
     {
         log( "Synchronization point announced: " + label );
-        if( label.equals(GUIFederate.READY_TO_RUN) )
+        //if( label.equals(WarehouseFederate.READY_TO_RUN) )
             this.isAnnounced = true;
     }
 
@@ -85,7 +84,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     public void federationSynchronized( String label, FederateHandleSet failed )
     {
         log( "Federation Synchronized: " + label );
-        if( label.equals(GUIFederate.READY_TO_RUN) )
+        //if( label.equals(WarehouseFederate.READY_TO_RUN) )
             this.isReadyToRun = true;
     }
 
@@ -121,10 +120,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
     {
         log( "Discoverd Object: handle=" + theObject + ", classHandle=" +
                 theObjectClass + ", name=" + objectName );
-        if(federate.roadHandle.equals(theObjectClass))
-            roadList.add(theObject);
-        if(federate.carHandle.equals(theObjectClass))
-            carList.add(theObject);
+
     }
 
     @Override
@@ -173,87 +169,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
         // print the attribute information
         builder.append( ", attributeCount=" + theAttributes.size() );
         builder.append( "\n" );
-        if(roadList.contains(theObject)){
-            HLAinteger32BE roadId = new HLA1516eInteger32BE();
-            HLA1516eBoolean light = new HLA1516eBoolean();
-            for( AttributeHandle attributeHandle : theAttributes.keySet() ) {
-                // print the attibute handle
-                builder.append("\tattributeHandle=").append(attributeHandle);
-                if (attributeHandle.equals(federate.roadIdHandle)) {
-                    builder.append(" (roadId)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        roadId.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(roadId.getValue());
 
-                } else if (attributeHandle.equals(federate.roadLightHandle)) {
-                    builder.append(" (light)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        light.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(light.getValue());
-                }
-            }
-            log("cos tam cos "+roadId.getValue() + "    "+light.getValue());
-            log("cos tam cos "+federate.roadList.size());
-                if(federate.roadList.size()==4){
-                    for (int i = 0; i < federate.roadList.size(); i++) {
-                        if(federate.roadList.get(i).getRoadId()==roadId.getValue()){
-                            federate.roadList.get(i).setLight(light.getValue());
-                            break;
-                        }
-                    }
-                }else {
-                    federate.roadList.add(new Road(roadId.getValue(), light.getValue()));
-                }
-                builder.append("\n");
-        }else if(carList.contains(theObject)){
-            HLAinteger32BE carId = new HLA1516eInteger32BE();
-            HLAinteger32BE roadId = new HLA1516eInteger32BE();
-            HLAinteger32BE roadToGoId = new HLA1516eInteger32BE();
-            for( AttributeHandle attributeHandle : theAttributes.keySet() ) {
-                // print the attibute handle
-                builder.append("\tattributeHandle=").append(attributeHandle);
-                if (attributeHandle.equals(federate.carIdHandle)) {
-                    builder.append(" (carId)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        carId.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(carId.getValue());
-
-                } else if (attributeHandle.equals(federate.carRoadHandle)) {
-                    builder.append(" (carRoad)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        roadId.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(roadId.getValue());
-                }else if (attributeHandle.equals(federate.carRoadToGoHandle)) {
-                    builder.append(" (carRoadToGo)    ");
-                    builder.append(", attributeValue=");
-                    try {
-                        roadToGoId.decode(theAttributes.get(attributeHandle));
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
-                    builder.append(roadToGoId.getValue());
-                }
-
-            }
-        federate.carList.add(new Car(carId.getValue(), roadId.getValue(),roadToGoId.getValue()));
-            builder.append("\n");
-        }
 
         log( builder.toString() );
     }
