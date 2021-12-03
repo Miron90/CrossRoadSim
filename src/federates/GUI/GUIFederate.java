@@ -1,22 +1,20 @@
 package federates.GUI;
 
 
+import federates.Car.Car;
 import federates.Road.Road;
 import helpers.BaseFederate;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.EncoderFactory;
-import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.*;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
 import hla.rti1516e.time.HLAfloat64TimeFactory;
 
-import java.awt.*;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import static helpers.Config.*;
 
@@ -42,7 +40,13 @@ public class GUIFederate extends BaseFederate{
     protected AttributeHandle roadIdHandle;
     protected AttributeHandle roadLightHandle;
 
+    protected ObjectClassHandle carHandle;
+    protected AttributeHandle carIdHandle;
+    protected AttributeHandle carRoadHandle;
+    protected AttributeHandle carRoadToGoHandle;
+
     ArrayList<Road> roadList = new ArrayList<>();
+    ArrayList<Car> carList = new ArrayList<>();
 
 
 
@@ -158,7 +162,17 @@ public class GUIFederate extends BaseFederate{
 
         while( fedamb.federateTime<SIM_TIME )
         {
-            double minTime=3;
+            for (int i=0; i<roadList.size();i++){
+                if(roadList.get(i).isLight()) {
+                    Gui.changeLight(i+1);
+                    roadList.get(i).setLight(false);
+                    log( "light changed" );
+                }
+            }
+            Gui.drawCar(carList);
+            Gui.myFrame.myCanvas.repaint();
+            log( "roadList size "+roadList.size() );
+            double minTime=1;
             advanceTime(minTime);
             log( "Time Advanced to " + fedamb.federateTime );
         }
@@ -259,6 +273,18 @@ public class GUIFederate extends BaseFederate{
         roadAttributes.add( this.roadLightHandle );
 
         rtiamb.subscribeObjectClassAttributes( this.roadHandle, roadAttributes );
+
+        this.carHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.Car");
+        this.carIdHandle = rtiamb.getAttributeHandle(this.carHandle,"carId");
+        this.carRoadHandle = rtiamb.getAttributeHandle(this.carHandle,"roadId");
+        this.carRoadToGoHandle = rtiamb.getAttributeHandle(this.carHandle,"roadToGo");
+
+        AttributeHandleSet carAttributes = rtiamb.getAttributeHandleSetFactory().create();
+        carAttributes.add( this.carIdHandle );
+        carAttributes.add( this.carRoadHandle );
+        carAttributes.add( this.carRoadToGoHandle );
+
+        rtiamb.subscribeObjectClassAttributes( this.carHandle, carAttributes );
 
     }
 

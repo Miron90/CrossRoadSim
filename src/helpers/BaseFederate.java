@@ -42,7 +42,7 @@ public abstract class BaseFederate {
 
     protected double randomTime() {
         Random r = new Random();
-        return 1 + (9 * r.nextDouble());
+        return 5 + (r.nextInt(15) * r.nextDouble());
     }
 
 }

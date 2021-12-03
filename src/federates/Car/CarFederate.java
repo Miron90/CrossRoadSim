@@ -1,10 +1,12 @@
-package federates.Statistics;
+package federates.Car;
 
 
 import federates.GUI.AWT;
+import federates.Road.Road;
 import helpers.BaseFederate;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.EncoderFactory;
+import hla.rti1516e.encoding.HLAboolean;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.*;
 import hla.rti1516e.time.HLAfloat64Interval;
@@ -16,10 +18,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static helpers.Config.*;
 
-public class GUIFederate extends BaseFederate{
+public class CarFederate extends BaseFederate{
 //----------------------------------------------------------
     //                    STATIC VARIABLES
     //----------------------------------------------------------
@@ -33,34 +36,18 @@ public class GUIFederate extends BaseFederate{
     //                   INSTANCE VARIABLES
     //----------------------------------------------------------
     private RTIambassador rtiamb;
-    private GUIFederateAmbassador fedamb;
+    private CarFederateAmbassador fedamb;
     private HLAfloat64TimeFactory timeFactory;
     protected EncoderFactory encoderFactory;
 
-    protected ObjectClassHandle queueHandle;
-    protected AttributeHandle queueIdHandle;
-    protected AttributeHandle queueLengthHandle;
-    protected AttributeHandle firstCustomerIdHandle;
+    protected ObjectClassHandle carHandle;
+    protected AttributeHandle carIdHandle;
+    protected AttributeHandle carRoadIdHandle;
+    private AttributeHandle carRoadToGoId;
 
-    protected ObjectClassHandle customerHandle;
-    protected AttributeHandle customerIdHandle;
-    protected AttributeHandle sausagesHandle;
-    protected AttributeHandle cheesehandle;
-    protected AttributeHandle beefHandle;
-    protected AttributeHandle queueEnterTimeHandle;
-    protected AttributeHandle queueLeftTimeHandle;
+    ArrayList<Car> carList = new ArrayList<>();
+    Random rand= new Random();
 
-    protected ObjectClassHandle cashHandle;
-    protected AttributeHandle cashIdHandle;
-    protected AttributeHandle cashQueueIdHandle;
-    protected AttributeHandle quantityOfServedHandle;
-
-    protected InteractionClassHandle queueLeftHandle;
-    protected InteractionClassHandle customerServedHandle;
-
-
-    protected List<GUI> GUIList = new ArrayList<>();
-    private boolean queuesNotSet = true;
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -73,7 +60,7 @@ public class GUIFederate extends BaseFederate{
      */
     public void runFederate( String federateName ) throws Exception
     {
-        who = "GUI";
+        who = "Car";
         /////////////////////////////////////////////////
         // 1 & 2. create the RTIambassador and Connect //
         /////////////////////////////////////////////////
@@ -83,7 +70,7 @@ public class GUIFederate extends BaseFederate{
 
         // connect
         log( "Connecting..." );
-        fedamb = new GUIFederateAmbassador( this );
+        fedamb = new CarFederateAmbassador( this );
         rtiamb.connect( fedamb, CallbackModel.HLA_EVOKED );
 
         //////////////////////////////
@@ -95,10 +82,10 @@ public class GUIFederate extends BaseFederate{
         try
         {
             URL[] modules = new URL[]{
-                    (new File("foms/Shop.xml")).toURI().toURL(),
+                    (new File("foms/CrossRoad.xml")).toURI().toURL(),
             };
 
-            rtiamb.createFederationExecution( "ShopFederation", modules );
+            rtiamb.createFederationExecution( "CrossRoadFederation", modules );
             log( "Created Federation" );
         }
         catch( FederationExecutionAlreadyExists exists )
@@ -116,8 +103,8 @@ public class GUIFederate extends BaseFederate{
         // 4. join the federation //
         ////////////////////////////
         rtiamb.joinFederationExecution( federateName,            // name for the federate
-                "cash",   // federate type
-                "ShopFederation"     // name of federation
+                "car",   // federate type
+                "CrossRoadFederation"     // name of federation
         );           // modules we want to add
 
         log( "Joined Federation as " + federateName );
@@ -171,7 +158,6 @@ public class GUIFederate extends BaseFederate{
         // produce, and all the data we want to know about
         publishAndSubscribe();
         log( "Published and Subscribed" );
-        new AWT();
         /////////////////////////////////////
         // 9. register an object to update //
         /////////////////////////////////////
@@ -184,13 +170,18 @@ public class GUIFederate extends BaseFederate{
 
         while( fedamb.federateTime<SIM_TIME )
         {
-
+            if(rand.nextInt(CAR_SPAWN_RATE)==0){
+                ObjectInstanceHandle carObjectHandle = rtiamb.registerObjectInstance(carHandle);
+                carList.add(new Car(carList.size(), carObjectHandle, rand.nextInt(4)));
+                updateCar(carList.get(carList.size()-1));
+                log("Registered Car, handle=" + carObjectHandle);
+            }
 
 
             double minTime=INFINITY;
 
             if(minTime==INFINITY | minTime>10) minTime=randomTime();
-            advanceTime(minTime);
+            advanceTime(randomTime());
             log( "Time Advanced to " + fedamb.federateTime );
         }
 
@@ -226,19 +217,20 @@ public class GUIFederate extends BaseFederate{
         }
     }
 
+    private void updateCar(Car car) throws NotConnected, FederateNotExecutionMember, ObjectInstanceNotKnown, RestoreInProgress, AttributeNotOwned, AttributeNotDefined, SaveInProgress, RTIinternalError {
+        AttributeHandleValueMap attributes = rtiamb.getAttributeHandleValueMapFactory().create(3);
 
-    private void customerLeftQueueInteraction(int id) throws NotConnected, FederateNotExecutionMember, RestoreInProgress, InteractionClassNotPublished, InteractionClassNotDefined, SaveInProgress, RTIinternalError, InteractionParameterNotDefined, NameNotFound, InvalidInteractionClassHandle {
-        ParameterHandleValueMap parameters = rtiamb.getParameterHandleValueMapFactory().create(1);
+        HLAinteger32BE carId = encoderFactory.createHLAinteger32BE( car.getCarId());
+        attributes.put( this.carIdHandle, carId.toByteArray() );
 
-        ParameterHandle queueIdHandle = rtiamb.getParameterHandle(this.queueLeftHandle, "queueId");
-        HLAinteger32BE queueId = encoderFactory.createHLAinteger32BE(id);
+        HLAinteger32BE carRoadId = encoderFactory.createHLAinteger32BE( car.getRoadId() );
+        attributes.put( this.carRoadIdHandle, carRoadId.toByteArray() );
 
-        parameters.put(queueIdHandle, queueId.toByteArray());
+        HLAinteger32BE carRoadToGoId = encoderFactory.createHLAinteger32BE( car.getRoadToGo() );
+        attributes.put( this.carRoadIdHandle, carRoadToGoId.toByteArray() );
 
-        rtiamb.sendInteraction( this.queueLeftHandle, parameters, generateTag() );
+        rtiamb.updateAttributeValues( car.getCarObjectId(), attributes, generateTag() );
     }
-
-
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -293,54 +285,17 @@ public class GUIFederate extends BaseFederate{
     private void publishAndSubscribe() throws RTIexception
     {
 ////		publish ProductsStrorage object
-        this.cashHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.Cash");
-        this.cashIdHandle = rtiamb.getAttributeHandle(this.cashHandle,"cashId");
-        this.cashQueueIdHandle = rtiamb.getAttributeHandle(this.cashHandle,"queueId");
-        this.quantityOfServedHandle = rtiamb.getAttributeHandle(this.cashHandle,"quantityOfServed");
+        this.carHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.Car");
+        this.carIdHandle = rtiamb.getAttributeHandle(this.carHandle,"carId");
+        this.carRoadIdHandle = rtiamb.getAttributeHandle(this.carHandle,"roadId");
+        this.carRoadToGoId = rtiamb.getAttributeHandle(this.carHandle,"roadToGo");
 
-        AttributeHandleSet cashAttributes = rtiamb.getAttributeHandleSetFactory().create();
-        cashAttributes.add( this.cashIdHandle );
-        cashAttributes.add( this.cashQueueIdHandle );
-        cashAttributes.add( this.quantityOfServedHandle );
+        AttributeHandleSet attributes = rtiamb.getAttributeHandleSetFactory().create();
+        attributes.add( this.carIdHandle );
+        attributes.add( this.carRoadIdHandle );
+        attributes.add( this.carRoadToGoId );
 
-        rtiamb.publishObjectClassAttributes( this.cashHandle, cashAttributes );
-
-        this.customerHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.Customer");
-        this.customerIdHandle = rtiamb.getAttributeHandle(this.customerHandle,"customerId");
-        this.sausagesHandle = rtiamb.getAttributeHandle(this.customerHandle,"sausages");
-        this.cheesehandle = rtiamb.getAttributeHandle(this.customerHandle,"cheese");
-        this.beefHandle = rtiamb.getAttributeHandle(this.customerHandle,"beef");
-        this.queueEnterTimeHandle = rtiamb.getAttributeHandle(this.customerHandle,"queueEnterTime");
-        this.queueLeftTimeHandle = rtiamb.getAttributeHandle(this.customerHandle,"queueLeftTime");
-
-        AttributeHandleSet customerAttributes = rtiamb.getAttributeHandleSetFactory().create();
-        customerAttributes.add( this.customerIdHandle );
-        customerAttributes.add( this.sausagesHandle );
-        customerAttributes.add( this.cheesehandle );
-        customerAttributes.add( this.beefHandle );
-        customerAttributes.add( this.queueEnterTimeHandle );
-        customerAttributes.add( this.queueLeftTimeHandle );
-
-        rtiamb.subscribeObjectClassAttributes( this.customerHandle, customerAttributes );
-
-        this.queueHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.Queue");
-        this.queueIdHandle = rtiamb.getAttributeHandle(this.queueHandle,"queueId");
-        this.queueLengthHandle = rtiamb.getAttributeHandle(this.queueHandle,"queueLength");
-        this.firstCustomerIdHandle = rtiamb.getAttributeHandle(this.queueHandle,"firstCustomerId");
-
-        AttributeHandleSet queueAttributes = rtiamb.getAttributeHandleSetFactory().create();
-        queueAttributes.add( this.queueIdHandle );
-        queueAttributes.add( this.queueLengthHandle );
-        queueAttributes.add( this.firstCustomerIdHandle );
-
-        rtiamb.subscribeObjectClassAttributes( this.queueHandle, queueAttributes );
-
-
-        this.queueLeftHandle = rtiamb.getInteractionClassHandle("HLAinteractionRoot.LeaveTheQueue" );
-        rtiamb.publishInteractionClass(this.queueLeftHandle);
-
-        this.customerServedHandle = rtiamb.getInteractionClassHandle("HLAinteractionRoot.CustomerServed" );
-        rtiamb.publishInteractionClass(this.customerServedHandle);
+        rtiamb.publishObjectClassAttributes( this.carHandle, attributes );
 
     }
 
@@ -377,7 +332,7 @@ public class GUIFederate extends BaseFederate{
     public static void main( String[] args )
     {
         // get a federate name, use "exampleFederate" as default
-        String federateName = "cash";
+        String federateName = "car";
         if( args.length != 0 )
         {
             federateName = args[0];
@@ -386,7 +341,7 @@ public class GUIFederate extends BaseFederate{
         try
         {
             // run the example federate
-            new GUIFederate().runFederate( federateName );
+            new CarFederate().runFederate( federateName );
         }
         catch( Exception rtie )
         {

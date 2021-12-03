@@ -19,7 +19,6 @@ public class MAIN {
 
         int y = 50;
         int x = 610;
-        awt.cars.add(new Car(x,y, 1000,610));
         while(true){
             for(int i=0;i<=awt.trafficColor.size();i++) {
                 //awt.changeLight(i);

@@ -2,6 +2,7 @@ package federates.Road;
 
 
 import helpers.BaseFederate;
+import helpers.Config;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.EncoderFactory;
 import hla.rti1516e.encoding.HLAboolean;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
 import static helpers.Config.*;
 
@@ -38,6 +40,7 @@ public class RoadFederate extends BaseFederate{
     protected AttributeHandle roadIdHandle;
     protected AttributeHandle roadLightHandle;
 
+    Random rand= new Random();
     ArrayList<Road> roadList = new ArrayList<>();
 
     ///////////////////////////////////////////////////////////////////////////
@@ -161,18 +164,25 @@ public class RoadFederate extends BaseFederate{
 
         for (int i=0;i<4;i++){
             ObjectInstanceHandle roadObjectHandle = rtiamb.registerObjectInstance(roadHandle);
-            if(i%2==1) {
+            if(i%2==0) {
                 roadList.add(new Road(roadObjectHandle, i, true));
             }else{
                 roadList.add(new Road(roadObjectHandle, i, false));
             }
             updateRoad(roadList.get(i));
-            log("Registered Queue, handle=" + roadObjectHandle);
+            log("Registered Road, handle=" + roadObjectHandle);
         }
 
         while( fedamb.federateTime<SIM_TIME )
         {
-            double minTime=3;
+            if (rand.nextInt(ROAD_CHANGE_TRAFFIC_LIGHT) == 0) {
+                for (int i=0;i<4;i++){
+                    roadList.get(i).setLight(true);
+                    updateRoad(roadList.get(i));
+                    log("Update Road, handle=" + roadList.get(i).getRoadObjectId());
+                }
+            }
+            double minTime=randomTime();
             advanceTime(minTime);
             log( "Time Advanced to " + fedamb.federateTime );
         }
@@ -318,7 +328,7 @@ public class RoadFederate extends BaseFederate{
     public static void main( String[] args )
     {
         // get a federate name, use "exampleFederate" as default
-        String federateName = "cash";
+        String federateName = "road";
         if( args.length != 0 )
         {
             federateName = args[0];

@@ -1,5 +1,7 @@
 package federates.GUI;
 
+import federates.Car.Car;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,7 +16,7 @@ public class AWT {
     MyFrame myFrame;
     Map<Integer, Color> trafficColor=new HashMap<>();
 
-    ArrayList<Car> cars = new ArrayList<Car>();
+    ArrayList<Car> cars = new ArrayList<>();
 
     public AWT(){
         trafficColor.put(1,Color.GREEN);
@@ -33,6 +35,10 @@ public class AWT {
     int roadWidth=150;
     int pivot=10;
 
+    public void drawCar(ArrayList<Car> cars) {
+        this.cars=cars;
+
+    }
 
 
     public class MyFrame extends Frame{
@@ -206,40 +212,19 @@ public class AWT {
         }
 
 
-        public void drawsmt(Graphics g){
-            g.setColor(Color.BLACK);
-            g.fillRect(50, 50, 14,14);
-            g.fillRect(67, 67, 14,14);
-            g.fillRect(678, 68, 14,14);
-            g.fillRect(678, 678, 14,14);
-        }
+
+
 
         public void drawCar(Graphics g, Car car) {
-
             g.setColor(Color.BLACK);
-            g.fillOval(car.nowx-5, car.nowy,10,10);
-            g.fillOval(car.nowx-5, car.nowy+40,10,10);
-            g.fillOval(car.nowx+35, car.nowy,10,10);
-            g.fillOval(car.nowx+35, car.nowy+40,10,10);
+            g.fillOval(car.getCurrentx()-5, car.getCurrenty(),10,10);
+            g.fillOval(car.getCurrentx()-5, car.getCurrenty()+40,10,10);
+            g.fillOval(car.getCurrentx()+35, car.getCurrenty(),10,10);
+            g.fillOval(car.getCurrentx()+35, car.getCurrenty()+40,10,10);
             g.setColor(Color.BLUE);
-            g.fillRect(car.nowx, car.nowy, 40,50);
+            g.fillRect(car.getCurrentx(), car.getCurrenty(), 40,50);
             //car.nowx+=1;
-            car.nowy+=3;
+            car.setCurrenty(car.getCurrenty()+3);
         }
     }
 }
-class Car{
-    int Fromx,Fromy;
-    int Tox,Toy;
-    int nowx,nowy;
-
-    public Car(int x, int y, int tox, int toy){
-        this.Fromy=y;
-        this.Fromx=x;
-        this.nowy=y;
-        this.nowx=x;
-        this.Tox=tox;
-        this.Toy=toy;
-    }
-}
-

@@ -2,16 +2,20 @@ package federates.Road;
 
 import hla.rti1516e.ObjectInstanceHandle;
 
+import java.awt.*;
+
 public class Road {
 
     private ObjectInstanceHandle roadObjectId;
     private int roadId;
     private boolean light;
+    private Color colorOfLight;
 
     public Road(ObjectInstanceHandle roadObjectHandle, int roadId, boolean light) {
         this.roadObjectId=roadObjectHandle;
         this.roadId = roadId;
-        this.light = light;
+        if(light) this.colorOfLight = Color.GREEN; else this.colorOfLight = Color.RED;
+        this.light = false;
     }
 
     public Road( int roadId, boolean light) {
