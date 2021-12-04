@@ -27,6 +27,7 @@ public class Car {
     private int beforeNextCary;
 
     private int carOnThisRoad;
+    private double federateTime;
 
     public Car(int carId, ObjectInstanceHandle carObjectId, int roadId) {
         this.carId = carId;
@@ -72,11 +73,12 @@ public class Car {
         this.roadId = roadId;
     }
 
-    public Car(int carId, int roadId, int roadToGo, int carOnThisRoad) {
+    public Car(int carId, int roadId, int roadToGo, int carOnThisRoad,double federateTime) {
         this.carId = carId;
         this.roadId = roadId;
         this.roadToGo = roadToGo;
         this.carOnThisRoad = carOnThisRoad;
+        this.federateTime=federateTime;
         switch(this.roadId){
             case 0:
                 currentx=535;
@@ -186,5 +188,21 @@ public class Car {
 
     public void setTrafficy(int trafficy) {
         this.trafficy = trafficy;
+    }
+
+    public boolean isAfterTraffic() {
+        return afterTraffic;
+    }
+
+    public void setAfterTraffic(boolean afterTraffic) {
+        this.afterTraffic = afterTraffic;
+    }
+
+    public boolean isAfterCrossRoad() {
+        return afterCrossRoad;
+    }
+
+    public void setAfterCrossRoad(boolean afterCrossRoad) {
+        this.afterCrossRoad = afterCrossRoad;
     }
 }
