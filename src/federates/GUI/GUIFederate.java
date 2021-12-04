@@ -109,7 +109,7 @@ public class GUIFederate extends BaseFederate{
         );           // modules we want to add
 
         log( "Joined Federation as " + federateName );
-
+        AWT Gui = new AWT();
         // cache the time factory for easy access
         this.timeFactory = (HLAfloat64TimeFactory)rtiamb.getTimeFactory();
 
@@ -159,7 +159,7 @@ public class GUIFederate extends BaseFederate{
         // produce, and all the data we want to know about
         publishAndSubscribe();
         log( "Published and Subscribed" );
-        AWT Gui = new AWT();
+
         for (int i=0; i<4;i++){
             carOnRoadList.add(0);
         }
