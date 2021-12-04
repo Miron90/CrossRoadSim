@@ -45,7 +45,7 @@ public class CarFederate extends BaseFederate{
     protected AttributeHandle carRoadIdHandle;
     private AttributeHandle carRoadToGoId;
 
-    ArrayList<Car> carList = new ArrayList<>();
+   //ArrayList<Car> carList = new ArrayList<>();
     Random rand= new Random();
 
 
@@ -168,12 +168,14 @@ public class CarFederate extends BaseFederate{
         // update the attribute values of the object we registered, and will
         // send an interaction.
 
+        int cars=0;
         while( fedamb.federateTime<SIM_TIME )
         {
             if(rand.nextInt(CAR_SPAWN_RATE)==0){
                 ObjectInstanceHandle carObjectHandle = rtiamb.registerObjectInstance(carHandle);
-                carList.add(new Car(carList.size(), carObjectHandle, rand.nextInt(4)));
-                updateCar(carList.get(carList.size()-1));
+                //carList.add();
+                updateCar(new Car(cars, carObjectHandle, rand.nextInt(4)));
+                cars++;
                 log("Registered Car, handle=" + carObjectHandle);
             }
 

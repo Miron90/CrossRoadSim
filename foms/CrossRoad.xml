@@ -76,174 +76,60 @@
 					<semantics>Attribute that tells if light should be turned on or off</semantics>
 				</attribute>
 			</objectClass>
-			<objectClass>
-				<name>Customer</name>
-				<sharing>PublishSubscribe</sharing>
-				<semantics>Customer Object</semantics>
-				<attribute>
-					<name>customerId</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Id of the customer</semantics>
-				</attribute>
-				<attribute>
-					<name>sausages</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Number indicating how many sausages does the customer have</semantics>
-				</attribute>
-				<attribute>
-					<name>cheese</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Number indicating how many cheese does the customer have</semantics>
-				</attribute>
-				<attribute>
-					<name>beef</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Number indicating how many beef does the customer have</semantics>
-				</attribute>
-				<attribute>
-					<name>queueEnterTime</name>
-					<dataType>HLAfloat32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Time for statictics to register</semantics>
-				</attribute>
-				<attribute>
-					<name>queueLeftTime</name>
-					<dataType>HLAfloat32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Time for statictics to register</semantics>
-				</attribute>
-			</objectClass>
-			<objectClass>
-				<name>Cash</name>
-				<sharing>PublishSubscribe</sharing>
-				<semantics>MCash Object</semantics>
-				<attribute>
-					<name>cashId</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Id of the Road</semantics>
-				</attribute>
-				<attribute>
-					<name>queueId</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>LId of the queue that belongs to Road</semantics>
-				</attribute>
-				<attribute>
-					<name>quantityOfServed</name>
-					<dataType>HLAinteger32BE</dataType>
-					<updateType>Conditional</updateType>
-					<updateCondition>On Change</updateCondition>
-					<ownership>Divest</ownership>
-					<sharing>PublishSubscribe</sharing>
-					<transportation>HLAreliable</transportation>
-					<order>Receive</order>
-					<semantics>Number for statistics indicating how amny customer have the Road served</semantics>
-				</attribute>
-			</objectClass>
 		</objectClass>
 	</objects>
 	<interactions>
 		<interactionClass>
 			<name>HLAinteractionRoot</name>
 			<interactionClass>
-				<name>JoinToQueue</name>
+				<name>EndCarWaitingOnTraffic</name>
 				<sharing>PublishSubscribe</sharing>
 				<transportation>HLAreliable</transportation>
 				<order>Receive</order>
-				<semantics>Interaction for joining to queue</semantics>
+				<semantics>Interaction that indicates that car is no longer waiting in traffic queue</semantics>
 				<parameter>
-					<name>queueId</name>
+					<name>carId</name>
 					<dataType>HLAinteger32BE</dataType>
-					<semantics>Id of the queue</semantics>
+					<semantics>Id of the car</semantics>
 				</parameter>
 				<parameter>
-					<name>customerId</name>
+					<name>carWaitTime</name>
+					<dataType>HLAdouble32BE</dataType>
+					<semantics>time that car was waiting</semantics>
+				</parameter>
+				<parameter>
+					<name>carRoadId</name>
 					<dataType>HLAinteger32BE</dataType>
-					<semantics>Id of the customer</semantics>
+					<semantics>Id of the road</semantics>
 				</parameter>
 			</interactionClass>
 			<interactionClass>
-				<name>LeaveTheQueue</name>
+				<name>carWaitingOnTraffic</name>
 				<sharing>PublishSubscribe</sharing>
 				<transportation>HLAreliable</transportation>
 				<order>Receive</order>
-				<semantics>Interaction for leaving to queue</semantics>
+				<semantics>Interaction that indicates that car is no longer waiting in traffic queue</semantics>
 				<parameter>
-					<name>queueId</name>
+					<name>carId</name>
 					<dataType>HLAinteger32BE</dataType>
-					<semantics>Id of the queue</semantics>
+					<semantics>Id of the car</semantics>
+				</parameter>
+				<parameter>
+					<name>carRoadId</name>
+					<dataType>HLAinteger32BE</dataType>
+					<semantics>Id of the road</semantics>
 				</parameter>
 			</interactionClass>
 			<interactionClass>
-				<name>CustomerServed</name>
+				<name>CarHasGone</name>
 				<sharing>PublishSubscribe</sharing>
 				<transportation>HLAreliable</transportation>
 				<order>Receive</order>
-				<semantics>Interaction for serving the customer</semantics>
+				<semantics>Interaction that indicates that car has ended his jouney</semantics>
 				<parameter>
-					<name>customerId</name>
+					<name>carId</name>
 					<dataType>HLAinteger32BE</dataType>
-					<semantics>Id of the customer</semantics>
-				</parameter>
-				<parameter>
-					<name>sausages</name>
-					<dataType>HLAinteger32BE</dataType>
-					<semantics>how many sausages have customer bought</semantics>
-				</parameter>
-				<parameter>
-					<name>cheese</name>
-					<dataType>HLAinteger32BE</dataType>
-					<semantics>how many cheese have customer bought</semantics>
-				</parameter>
-				<parameter>
-					<name>beef</name>
-					<dataType>HLAinteger32BE</dataType>
-					<semantics>how many beef have customer bought</semantics>
+					<semantics>Id of the car</semantics>
 				</parameter>
 			</interactionClass>
 		</interactionClass>

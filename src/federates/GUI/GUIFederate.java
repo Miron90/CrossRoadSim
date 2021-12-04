@@ -6,6 +6,8 @@ import federates.Road.Road;
 import helpers.BaseFederate;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.EncoderFactory;
+import hla.rti1516e.encoding.HLAfloat32BE;
+import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.*;
 import hla.rti1516e.time.HLAfloat64Interval;
 import hla.rti1516e.time.HLAfloat64Time;
@@ -44,6 +46,11 @@ public class GUIFederate extends BaseFederate{
     protected AttributeHandle carIdHandle;
     protected AttributeHandle carRoadHandle;
     protected AttributeHandle carRoadToGoHandle;
+
+    protected InteractionClassHandle carEndWaitInTrafficHandle;
+    protected InteractionClassHandle carWaitInTrafficHandle;
+
+    protected InteractionClassHandle carIsGoneHandle;
 
     ArrayList<Road> roadList = new ArrayList<>();
     ArrayList<Car> carList = new ArrayList<>();
@@ -109,7 +116,7 @@ public class GUIFederate extends BaseFederate{
         );           // modules we want to add
 
         log( "Joined Federation as " + federateName );
-        AWT Gui = new AWT();
+        AWT Gui = new AWT(this);
         // cache the time factory for easy access
         this.timeFactory = (HLAfloat64TimeFactory)rtiamb.getTimeFactory();
 
@@ -172,10 +179,27 @@ public class GUIFederate extends BaseFederate{
                     log( "light changed" );
                 }
             }
-            Gui.drawCar(carList);
+
+            for (int i=0; i<carList.size();i++){
+                if(carList.get(i).isInQueue() && !carList.get(i).isSendOnTraffic()) {
+                    sendInteractionWaitOnTraffic(carList.get(i));
+                    carList.get(i).setSendOnTraffic(true);
+                    log( "send wait interaction" );
+                }
+                if(!carList.get(i).isInQueue() && carList.get(i).isSendOnTraffic()) {
+                    sendInteractionEndWaitOnTraffic(carList.get(i));
+                    carList.get(i).setSendOnTraffic(false);
+                    log( "send end wait interaction" );
+                }
+                if(carList.get(i).isAfterCrossRoad() && !carList.get(i).isSendAfterCrossRoad()) {
+                    sendInteractionCarIsGone(carList.get(i));
+                    carList.get(i).setSendAfterCrossRoad(true);
+                    log( "send car is gone interaction" );
+                }
+            }
+            Gui.drawCar();
             Gui.setCarsOnRoad(carOnRoadList);
             Gui.myFrame.myCanvas.repaint();
-            log( "roadList size "+roadList.size() );
             double minTime=1;
             advanceTime(minTime);
             log( "Time Advanced to " + fedamb.federateTime );
@@ -213,7 +237,50 @@ public class GUIFederate extends BaseFederate{
         }
     }
 
+    private void sendInteractionEndWaitOnTraffic(Car car) throws NotConnected, FederateNotExecutionMember, NameNotFound, RTIinternalError, InvalidInteractionClassHandle, InteractionClassNotPublished, InteractionParameterNotDefined, InteractionClassNotDefined, RestoreInProgress, SaveInProgress {
+        ParameterHandleValueMap parameters = rtiamb.getParameterHandleValueMapFactory().create(3);
 
+        ParameterHandle carWaitHandle = rtiamb.getParameterHandle(this.carEndWaitInTrafficHandle, "carId");
+        HLAinteger32BE carId = encoderFactory.createHLAinteger32BE(car.getCarId());
+
+        ParameterHandle carWaitTimeHandle = rtiamb.getParameterHandle(this.carEndWaitInTrafficHandle, "carWaitTime");
+        HLAfloat32BE carWaitTime = encoderFactory.createHLAfloat32BE((float) car.getWaitTime());
+
+        ParameterHandle roadIdHandle = rtiamb.getParameterHandle(this.carEndWaitInTrafficHandle, "carRoadId");
+        HLAinteger32BE roadId = encoderFactory.createHLAinteger32BE( car.getRoadId());
+
+        parameters.put(carWaitHandle, carId.toByteArray());
+        parameters.put(carWaitTimeHandle, carWaitTime.toByteArray());
+        parameters.put(roadIdHandle, roadId.toByteArray());
+
+        rtiamb.sendInteraction( this.carEndWaitInTrafficHandle, parameters, generateTag() );
+    }
+
+    private void sendInteractionWaitOnTraffic(Car car) throws NotConnected, FederateNotExecutionMember, NameNotFound, RTIinternalError, InvalidInteractionClassHandle, InteractionClassNotPublished, InteractionParameterNotDefined, InteractionClassNotDefined, RestoreInProgress, SaveInProgress {
+        ParameterHandleValueMap parameters = rtiamb.getParameterHandleValueMapFactory().create(2);
+
+        ParameterHandle carWaitHandle = rtiamb.getParameterHandle(this.carWaitInTrafficHandle, "carId");
+        HLAinteger32BE carId = encoderFactory.createHLAinteger32BE(car.getCarId());
+
+        ParameterHandle roadIdHandle = rtiamb.getParameterHandle(this.carWaitInTrafficHandle, "carRoadId");
+        HLAinteger32BE roadId = encoderFactory.createHLAinteger32BE( car.getRoadId());
+
+        parameters.put(carWaitHandle, carId.toByteArray());
+        parameters.put(roadIdHandle, roadId.toByteArray());
+
+        rtiamb.sendInteraction( this.carWaitInTrafficHandle, parameters, generateTag() );
+    }
+
+    private void sendInteractionCarIsGone(Car car) throws NotConnected, FederateNotExecutionMember, NameNotFound, RTIinternalError, InvalidInteractionClassHandle, InteractionClassNotPublished, InteractionParameterNotDefined, InteractionClassNotDefined, RestoreInProgress, SaveInProgress {
+        ParameterHandleValueMap parameters = rtiamb.getParameterHandleValueMapFactory().create(1);
+
+        ParameterHandle carIsGoneHandle = rtiamb.getParameterHandle(this.carIsGoneHandle, "carId");
+        HLAinteger32BE carId = encoderFactory.createHLAinteger32BE(car.getCarId());
+
+        parameters.put(carIsGoneHandle, carId.toByteArray());
+
+        rtiamb.sendInteraction( this.carIsGoneHandle, parameters, generateTag() );
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -227,6 +294,11 @@ public class GUIFederate extends BaseFederate{
     {
         if(fedamb!=null) System.out.println( "time: "+fedamb.federateTime+" | "+who + message );
         else System.out.println( who + message );
+    }
+
+    public double getTime()
+    {
+        return fedamb.federateTime;
     }
 
     private void enableTimePolicy() throws Exception
@@ -289,6 +361,15 @@ public class GUIFederate extends BaseFederate{
         carAttributes.add( this.carRoadToGoHandle );
 
         rtiamb.subscribeObjectClassAttributes( this.carHandle, carAttributes );
+
+        this.carEndWaitInTrafficHandle = rtiamb.getInteractionClassHandle("HLAinteractionRoot.EndCarWaitingOnTraffic" );
+        rtiamb.publishInteractionClass(this.carEndWaitInTrafficHandle);
+
+        this.carWaitInTrafficHandle = rtiamb.getInteractionClassHandle("HLAinteractionRoot.carWaitingOnTraffic" );
+        rtiamb.publishInteractionClass(this.carWaitInTrafficHandle);
+
+        this.carIsGoneHandle = rtiamb.getInteractionClassHandle("HLAinteractionRoot.CarHasGone" );
+        rtiamb.publishInteractionClass(this.carIsGoneHandle);
 
     }
 

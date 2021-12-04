@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MAIN {
-    static AWT awt = new AWT();
+    static AWT awt = new AWT(null);
     public static void main( String[] args ) throws InterruptedException {
 
 

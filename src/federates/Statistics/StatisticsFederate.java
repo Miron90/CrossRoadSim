@@ -37,6 +37,23 @@ public class StatisticsFederate extends BaseFederate{
     private HLAfloat64TimeFactory timeFactory;
     protected EncoderFactory encoderFactory;
 
+    protected ObjectClassHandle carHandle;
+
+    protected InteractionClassHandle EndCarWaitingOnTrafficHandle;
+    protected ParameterHandle carIdHandle;
+    protected ParameterHandle carWaitTimeHandle;
+    protected ParameterHandle roadIdHandle;
+
+    protected InteractionClassHandle carWaitingOnTrafficHandle;
+    protected ParameterHandle carWaitIdHandle;
+    protected ParameterHandle waitRoadIdHandle;
+
+    protected InteractionClassHandle carIsGoneHandle;
+    protected ParameterHandle carIsGoneIdHandle;
+
+    protected int howManyCars;
+    protected Statistics statistics= new Statistics();
+
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -159,13 +176,13 @@ public class StatisticsFederate extends BaseFederate{
 
         while( fedamb.federateTime<SIM_TIME )
         {
-
-
-
-            double minTime=INFINITY;
-
-            if(minTime==INFINITY | minTime>10) minTime=randomTime();
-            advanceTime(minTime);
+            for(int i=0;i<statistics.getCarOnRoadInQueue().length;i++){
+                log("Car in Queue on road "+i+" "+statistics.getCarOnRoadInQueue()[i]);
+            }
+            log("Car in Queue "+statistics.getCarsThatWaitInQueue());
+            log("Car in mean time in Queue "+statistics.getMeanTimeWait());
+            log("Car that made the crossroad "+statistics.getCarsThatAreGone());
+            advanceTime(randomTime());
             log( "Time Advanced to " + fedamb.federateTime );
         }
 
@@ -256,8 +273,27 @@ public class StatisticsFederate extends BaseFederate{
     private void publishAndSubscribe() throws RTIexception
     {
 ////		publish ProductsStrorage object
+        this.carHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.Car");
+
+        AttributeHandleSet carAttributes = rtiamb.getAttributeHandleSetFactory().create();
+
+        rtiamb.subscribeObjectClassAttributes( this.carHandle, carAttributes );
 
 
+        this.EndCarWaitingOnTrafficHandle = rtiamb.getInteractionClassHandle( "HLAinteractionRoot.EndCarWaitingOnTraffic" );
+        this.carIdHandle = rtiamb.getParameterHandle(this.EndCarWaitingOnTrafficHandle, "carId" );
+        this.carWaitTimeHandle = rtiamb.getParameterHandle(this.EndCarWaitingOnTrafficHandle, "carWaitTime" );
+        this.roadIdHandle = rtiamb.getParameterHandle(this.EndCarWaitingOnTrafficHandle, "carRoadId" );
+        rtiamb.subscribeInteractionClass( this.EndCarWaitingOnTrafficHandle );
+
+        this.carWaitingOnTrafficHandle = rtiamb.getInteractionClassHandle( "HLAinteractionRoot.carWaitingOnTraffic" );
+        this.carWaitIdHandle = rtiamb.getParameterHandle(this.carWaitingOnTrafficHandle, "carId" );
+        this.waitRoadIdHandle = rtiamb.getParameterHandle(this.carWaitingOnTrafficHandle, "carRoadId" );
+        rtiamb.subscribeInteractionClass( this.carWaitingOnTrafficHandle );
+
+        this.carIsGoneHandle = rtiamb.getInteractionClassHandle( "HLAinteractionRoot.CarHasGone" );
+        this.carIsGoneIdHandle = rtiamb.getParameterHandle(this.carWaitingOnTrafficHandle, "carId" );
+        rtiamb.subscribeInteractionClass( this.carIsGoneHandle );
     }
 
     /**
@@ -293,7 +329,7 @@ public class StatisticsFederate extends BaseFederate{
     public static void main( String[] args )
     {
         // get a federate name, use "exampleFederate" as default
-        String federateName = "cash";
+        String federateName = "statistics";
         if( args.length != 0 )
         {
             federateName = args[0];

@@ -1,11 +1,14 @@
 package federates.Statistics;
 
+import federates.Car.Car;
+import federates.Road.Road;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.DecoderException;
 import hla.rti1516e.encoding.HLAfloat32BE;
 import hla.rti1516e.encoding.HLAinteger32BE;
 import hla.rti1516e.exceptions.FederateInternalError;
 import hla.rti1516e.time.HLAfloat64Time;
+import org.portico.impl.hla1516e.types.encoding.HLA1516eBoolean;
 import org.portico.impl.hla1516e.types.encoding.HLA1516eFloat32BE;
 import org.portico.impl.hla1516e.types.encoding.HLA1516eInteger32BE;
 
@@ -37,6 +40,8 @@ public class StatisticsFederateAmbassador extends NullFederateAmbassador {
     protected boolean isReadyToRun       = false;
 
     protected boolean isRunning       = true;
+
+    List<ObjectInstanceHandle> carList = new ArrayList<>();
 
 
     //----------------------------------------------------------
@@ -120,7 +125,8 @@ public class StatisticsFederateAmbassador extends NullFederateAmbassador {
     {
         log( "Discoverd Object: handle=" + theObject + ", classHandle=" +
                 theObjectClass + ", name=" + objectName );
-
+        if(federate.carHandle.equals(theObjectClass))
+            carList.add(theObject);
     }
 
     @Override
@@ -169,13 +175,91 @@ public class StatisticsFederateAmbassador extends NullFederateAmbassador {
         // print the attribute information
         builder.append( ", attributeCount=" + theAttributes.size() );
         builder.append( "\n" );
-        
+
+        if(carList.contains(theObject)){
+            federate.howManyCars++;
+            }
+            builder.append("\n");
 
         log( builder.toString() );
     }
 
+    @Override
+    public void receiveInteraction( InteractionClassHandle interactionClass,
+                                    ParameterHandleValueMap theParameters,
+                                    byte[] tag,
+                                    OrderType sentOrdering,
+                                    TransportationTypeHandle theTransport,
+                                    FederateAmbassador.SupplementalReceiveInfo receiveInfo )
+            throws FederateInternalError
+    {
+        // just pass it on to the other method for printing purposes
+        // passing null as the time will let the other method know it
+        // it from us, not from the RTI
+        this.receiveInteraction( interactionClass,
+                theParameters,
+                tag,
+                sentOrdering,
+                theTransport,
+                null,
+                sentOrdering,
+                receiveInfo );
+    }
 
+    @Override
+    public void receiveInteraction( InteractionClassHandle interactionClass,
+                                    ParameterHandleValueMap theParameters,
+                                    byte[] tag,
+                                    OrderType sentOrdering,
+                                    TransportationTypeHandle theTransport,
+                                    LogicalTime time,
+                                    OrderType receivedOrdering,
+                                    FederateAmbassador.SupplementalReceiveInfo receiveInfo )
+            throws FederateInternalError
+    {
+        StringBuilder builder = new StringBuilder( "Interaction Received:" );
 
+        // print the handle
+        builder.append( " handle=" + interactionClass );
+
+        if(federate.EndCarWaitingOnTrafficHandle.equals(interactionClass)){
+            {
+                byte[] carId = theParameters.get(federate.carIdHandle);
+                byte[] carWait = theParameters.get(federate.carWaitTimeHandle);
+                byte[] roadId = theParameters.get(federate.roadIdHandle);
+                HLAinteger32BE carIdInt = new HLA1516eInteger32BE();
+                HLAfloat32BE carWaitDouble = new HLA1516eFloat32BE();
+                HLAinteger32BE roadIdInt = new HLA1516eInteger32BE();
+                try {
+                    carIdInt.decode(carId);
+                    carWaitDouble.decode(carWait);
+                    roadIdInt.decode(roadId);
+                } catch (DecoderException e) {
+                    e.printStackTrace();
+                }
+                federate.statistics.subCarOnRoadInQueue(roadIdInt.getValue());
+                federate.statistics.subCarsThatWaitInQueue();
+                federate.statistics.setTimeWait(carWaitDouble.getValue());
+
+            }
+        }else if (federate.carWaitingOnTrafficHandle.equals(interactionClass)){
+            byte[] carId = theParameters.get(federate.carWaitIdHandle);
+            byte[] roadId = theParameters.get(federate.waitRoadIdHandle);
+            HLAinteger32BE carIdInt = new HLA1516eInteger32BE();
+            HLAinteger32BE roadIdInt = new HLA1516eInteger32BE();
+            try {
+                carIdInt.decode(carId);
+                roadIdInt.decode(roadId);
+            } catch (DecoderException e) {
+                e.printStackTrace();
+            }
+            federate.statistics.addCarOnRoadInQueue(roadIdInt.getValue());
+            federate.statistics.addCarsThatWaitInQueue();
+        }else if(federate.carIsGoneHandle.equals(interactionClass)){
+            federate.statistics.setCarsThatAreGone();
+        }
+        log( builder.toString() );
+    }
     //----------------------------------------------------------
     //                     STATIC METHODS
     //----------------------------------------------------------

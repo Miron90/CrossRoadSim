@@ -13,6 +13,8 @@ import java.util.Map;
 
 public class AWT {
 
+    GUIFederate femab;
+
     MyFrame myFrame;
     Map<Integer, Color> trafficColor=new HashMap<>();
 
@@ -27,11 +29,12 @@ public class AWT {
     ArrayList<Integer> carsOnRoad = new ArrayList<>();
 
 
-    public AWT(){
+    public AWT(GUIFederate femab){
         trafficColor.put(1,Color.GREEN);
         trafficColor.put(2,Color.RED);
         trafficColor.put(3,Color.GREEN);
         trafficColor.put(4,Color.RED);
+        this.femab=femab;
         myFrame = new MyFrame();
     }
 
@@ -44,13 +47,18 @@ public class AWT {
     int roadWidth=150;
     int pivot=10;
 
-    public void drawCar(ArrayList<Car> cars) {
-        for (Car car: cars) {
-            if(car.getRoadId()==0 && !carsOnRoad1.contains(car) && !carsOnEnd.contains(car))carsOnRoad1.add(car);
-            else if (car.getRoadId()==1&& !carsOnRoad2.contains(car)&& !carsOnEnd.contains(car))carsOnRoad2.add(car);
-            else if (car.getRoadId()==2&& !carsOnRoad3.contains(car)&& !carsOnEnd.contains(car))carsOnRoad3.add(car);
-            else if (car.getRoadId()==3&& !carsOnRoad4.contains(car)&& !carsOnEnd.contains(car))carsOnRoad4.add(car);
-
+    public void drawCar() {
+        for (Car car: femab.carList) {
+            if(!car.isAfterCrossRoad()) {
+                if (car.getRoadId() == 0 && !carsOnRoad1.contains(car) && !carsOnEnd.contains(car))
+                    carsOnRoad1.add(car);
+                else if (car.getRoadId() == 1 && !carsOnRoad2.contains(car) && !carsOnEnd.contains(car))
+                    carsOnRoad2.add(car);
+                else if (car.getRoadId() == 2 && !carsOnRoad3.contains(car) && !carsOnEnd.contains(car))
+                    carsOnRoad3.add(car);
+                else if (car.getRoadId() == 3 && !carsOnRoad4.contains(car) && !carsOnEnd.contains(car))
+                    carsOnRoad4.add(car);
+            }
         }
     }
 
@@ -247,12 +255,15 @@ public class AWT {
 
         public void drawCar(Graphics g, Car car, int carOfNumber) {
             //car.nowx+=1;
-            System.out.println(carsOnCrossRoad.size());
             for (int i=0;i<carsOnCrossRoad.size();i++) {
-                System.out.println("car is on "+carsOnCrossRoad.get(i).getRoadId());
-                System.out.println("car is going to "+carsOnCrossRoad.get(i).getRoadToGo());
                 if((carsOnCrossRoad.get(i).getCurrentx()<450 || carsOnCrossRoad.get(i).getCurrentx()>750) || (carsOnCrossRoad.get(i).getCurrenty()<450 || carsOnCrossRoad.get(i).getCurrenty()>750)){
                     carsOnCrossRoad.remove(carsOnCrossRoad.get(i));
+                }
+            }
+            for (int i=0;i<carsOnEnd.size();i++) {
+                if((carsOnEnd.get(i).getCurrentx()<-60 || carsOnEnd.get(i).getCurrentx()>1260) || (carsOnEnd.get(i).getCurrenty()<-60 || carsOnEnd.get(i).getCurrenty()>1260)){
+                    carsOnEnd.remove(carsOnEnd.get(i));
+                    femab.carList.get(carsOnEnd.get(i).getCarId()).setAfterCrossRoad(true);
                 }
             }
             if(car.isOnTraffic()) {
@@ -311,7 +322,6 @@ public class AWT {
 
                         break;
                     case 1:
-                            //TODO poinformuj o tym ze juz jedziesz nie jestes w kolejce
                             if(car.getRoadToGo()==3){
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-6);
@@ -325,7 +335,7 @@ public class AWT {
                                 }
                             }else if(car.getRoadToGo()==2){
                                 if(car.getCurrentx()<=535){
-                                    driveToRoad3(g, car);
+                                    driveToRoad1(g, car);
                                     car.setCurrenty(car.getCurrenty()+6);
                                 }else{
                                     driveToRoad2(g, car);
@@ -383,7 +393,6 @@ public class AWT {
                 switch (car.getRoadId()){
                     case 0:
                         if(trafficColor.get(car.getRoadId()+1)==Color.RED){
-                            //TODO poinformuj o tym ze juz jedziesz nie jestes w kolejce
                             if(car.getRoadToGo()==2){
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty()+6);
@@ -424,7 +433,6 @@ public class AWT {
                         break;
                     case 1:
                         if(trafficColor.get(car.getRoadId()+1)==Color.RED){
-                            //TODO poinformuj o tym ze juz jedziesz nie jestes w kolejce
                             if(car.getRoadToGo()==3){
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-6);
@@ -465,7 +473,6 @@ public class AWT {
                         break;
                     case 2:
                         if(trafficColor.get(car.getRoadId()+1)==Color.RED){
-                            //TODO poinformuj o tym ze juz jedziesz nie jestes w kolejce
                             if(car.getRoadToGo()==0){
                                 driveToRoad3(g, car);
                                 car.setCurrenty(car.getCurrenty()-6);
@@ -502,7 +509,6 @@ public class AWT {
                         break;
                     case 3:
                         if(trafficColor.get(car.getRoadId()+1)==Color.RED){
-                            //TODO poinformuj o tym ze juz jedziesz nie jestes w kolejce
                             if(car.getRoadToGo()==1){
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx()+6);
@@ -544,39 +550,73 @@ public class AWT {
                         driveToRoad1(g, car);
                         if(carOfNumber!=0 && carsOnRoad1.get(carOfNumber-1).getCurrenty()>carsOnRoad1.get(carOfNumber).getCurrenty()+50+30){
                             car.setCurrenty(car.getCurrenty()+3);
-                        }else if (carOfNumber==0) car.setCurrenty(car.getCurrenty()+3);
+                            femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setInQueue(false);
+                            femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
+                        }else if (carOfNumber==0) {
+                            car.setCurrenty(car.getCurrenty() + 3);
+                        }else if (carsOnRoad1.get(carOfNumber-1).isInQueue()){
+                            femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
+                        }
                         if(car.getCurrenty()>=car.getTrafficy()){
                             car.setOnTraffic(true);
+                            femab.carList.get(car.getCarId()).setOnTraffic(true);
+                            femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }
                         break;
                     case 1:
                         driveToRoad2(g, car);
                         if(carOfNumber!=0 && carsOnRoad2.get(carOfNumber-1).getCurrentx()<carsOnRoad2.get(carOfNumber).getCurrentx()-50-30){
                             car.setCurrentx(car.getCurrentx()-3);
+                            femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setInQueue(false);
+                            femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }else if (carOfNumber==0) car.setCurrentx(car.getCurrentx()-3);
-
+                        else if (carsOnRoad2.get(carOfNumber-1).isInQueue()){
+                            femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
+                        }
                         if(car.getCurrentx()<=car.getTrafficx()){
                             car.setOnTraffic(true);
+                            femab.carList.get(car.getCarId()).setOnTraffic(true);
+                            femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }
                         break;
                     case 2:
                         driveToRoad3(g, car);
                         if(carOfNumber!=0 && carsOnRoad3.get(carOfNumber-1).getCurrenty()<carsOnRoad3.get(carOfNumber).getCurrenty()-30-50){
                             car.setCurrenty(car.getCurrenty()-3);
+                            femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setInQueue(false);
+                            femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }else if (carOfNumber==0) car.setCurrenty(car.getCurrenty()-3);
-
+                        else if (carsOnRoad3.get(carOfNumber-1).isInQueue()){
+                            femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
+                        }
                         if(car.getCurrenty()<=car.getTrafficy()){
                             car.setOnTraffic(true);
+                            femab.carList.get(car.getCarId()).setOnTraffic(true);
+                            femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }
                         break;
                     case 3:
                         driveToRoad4(g, car);
                         if(carOfNumber!=0 && carsOnRoad4.get(carOfNumber-1).getCurrentx()>carsOnRoad4.get(carOfNumber).getCurrentx()+50+30){
                             car.setCurrentx(car.getCurrentx()+3);
+                            femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setInQueue(false);
+                            femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }else if (carOfNumber==0) car.setCurrentx(car.getCurrentx()+3);
-
+                        else if (carsOnRoad4.get(carOfNumber-1).isInQueue()){
+                            femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
+                        }
                         if(car.getCurrentx()>=car.getTrafficx()){
                             car.setOnTraffic(true);
+                            femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setInQueue(true);
+                            femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
+                            femab.carList.get(car.getCarId()).setOnTraffic(true);
                         }
                         break;
                 }
@@ -633,7 +673,11 @@ public class AWT {
         }
         public void ChangeState(Car car){
             car.setOnTraffic(false);
+            femab.carList.get(car.getCarId()).setInQueue(false);
+            femab.carList.get(car.getCarId()).setOnTraffic(false);
+            femab.carList.get(car.getCarId()).setWaitTime(femab.getTime());
             car.setAfterTraffic(true);
+            femab.carList.get(car.getCarId()).setAfterTraffic(true);
             if(car.getRoadId()==0 && car.getRoadToGo()!=3 && !carsOnCrossRoad.contains(car)) {
                 carsOnCrossRoad.add(car);
             }

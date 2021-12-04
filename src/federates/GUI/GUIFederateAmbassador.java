@@ -200,8 +200,6 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
                     builder.append(light.getValue());
                 }
             }
-            log("cos tam cos "+roadId.getValue() + "    "+light.getValue());
-            log("cos tam cos "+federate.roadList.size());
                 if(federate.roadList.size()==4){
                     for (int i = 0; i < federate.roadList.size(); i++) {
                         if(federate.roadList.get(i).getRoadId()==roadId.getValue()){

@@ -10,6 +10,6 @@ public class Config {
     public static final Integer SIM_TIME = 999999;
 
     public static final Integer ROAD_CHANGE_TRAFFIC_LIGHT = 10;
-    public static final Integer CAR_SPAWN_RATE = 2;
+    public static final Integer CAR_SPAWN_RATE = 5;
 
 }

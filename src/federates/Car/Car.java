@@ -12,10 +12,15 @@ public class Car {
     private int roadId;
     private int roadToGo;
     private boolean onTraffic = false;
+    private boolean sendOnTraffic = false;
+    private boolean isInQueue = false;
 
     private boolean afterTraffic = false;
+    private boolean sendAfterTraffic = false;
 
     private boolean afterCrossRoad = false;
+    private boolean sendAfterCrossRoad = false;
+    private boolean timeIsSet = false;
 
     private int endx;
     private int endy;
@@ -27,7 +32,8 @@ public class Car {
     private int beforeNextCary;
 
     private int carOnThisRoad;
-    private double federateTime;
+    private double waitTime;
+    private double startWaiting;
 
     public Car(int carId, ObjectInstanceHandle carObjectId, int roadId) {
         this.carId = carId;
@@ -78,7 +84,6 @@ public class Car {
         this.roadId = roadId;
         this.roadToGo = roadToGo;
         this.carOnThisRoad = carOnThisRoad;
-        this.federateTime=federateTime;
         switch(this.roadId){
             case 0:
                 currentx=535;
@@ -130,8 +135,20 @@ public class Car {
         return onTraffic;
     }
 
-    public void setOnTraffic(boolean onTraffic) {
-        this.onTraffic = onTraffic;
+    public boolean isInQueue() {
+        return isInQueue;
+    }
+
+    public boolean isSendAfterCrossRoad() {
+        return sendAfterCrossRoad;
+    }
+
+    public void setSendAfterCrossRoad(boolean sendAfterCrossRoad) {
+        this.sendAfterCrossRoad = sendAfterCrossRoad;
+    }
+
+    public void setInQueue(boolean inQueue) {
+        isInQueue = inQueue;
     }
 
     public int getCarOnThisRoad() {
@@ -204,5 +221,54 @@ public class Car {
 
     public void setAfterCrossRoad(boolean afterCrossRoad) {
         this.afterCrossRoad = afterCrossRoad;
+    }
+
+    public void setOnTraffic(boolean onTraffic) {
+        this.onTraffic = onTraffic;
+    }
+
+    public boolean isSendOnTraffic() {
+        return sendOnTraffic;
+    }
+
+    public void setSendOnTraffic(boolean sendOnTraffic) {
+        this.sendOnTraffic = sendOnTraffic;
+    }
+
+    public boolean isSendAfterTraffic() {
+        return sendAfterTraffic;
+    }
+
+    public void setSendAfterTraffic(boolean sendAfterTraffic) {
+        this.sendAfterTraffic = sendAfterTraffic;
+    }
+
+    public int getBeforeNextCarx() {
+        return beforeNextCarx;
+    }
+
+    public void setBeforeNextCarx(int beforeNextCarx) {
+        this.beforeNextCarx = beforeNextCarx;
+    }
+
+    public int getBeforeNextCary() {
+        return beforeNextCary;
+    }
+
+    public void setBeforeNextCary(int beforeNextCary) {
+        this.beforeNextCary = beforeNextCary;
+    }
+
+    public double getWaitTime() {
+        return waitTime;
+    }
+
+    public void setWaitTime(double waitTime) {
+        if(timeIsSet){
+            this.waitTime=waitTime-startWaiting;
+        }else{
+            this.startWaiting=waitTime;
+            timeIsSet=true;
+        }
     }
 }
