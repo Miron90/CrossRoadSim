@@ -34,10 +34,6 @@ public class Statistics {
         this.carsThatAreGone++;
     }
 
-    public double getTimeWait() {
-        return timeWait;
-    }
-
     public void setTimeWait(double timeWait) {
         this.timeWait += timeWait;
         if(this.carsWasInQueue>0) {
@@ -47,10 +43,6 @@ public class Statistics {
 
     public double getMeanTimeWait() {
         return meanTimeWait;
-    }
-
-    public void setMeanTimeWait(double meanTimeWait) {
-        this.meanTimeWait = meanTimeWait;
     }
 
     public int getCarsThatWaitInQueue() {

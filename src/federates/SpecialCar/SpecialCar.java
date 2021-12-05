@@ -16,14 +16,7 @@ public class SpecialCar {
     private int currentx;
     private int currenty;
 
-    private int centerx;
-    private int centery;
-
     private boolean spin;
-
-    private boolean afterCrossRoad = false;
-    private boolean sendAfterCrossRoad = false;
-
 
     public SpecialCar(int id, ObjectInstanceHandle objectId, int roadId) {
         this.id=id;
@@ -64,16 +57,8 @@ public class SpecialCar {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public ObjectInstanceHandle getObjectId() {
         return objectId;
-    }
-
-    public void setObjectId(ObjectInstanceHandle objectId) {
-        this.objectId = objectId;
     }
 
     public int getRoadId() {
@@ -86,10 +71,6 @@ public class SpecialCar {
 
     public int getRoadToGoId() {
         return roadToGoId;
-    }
-
-    public void setRoadToGoId(int roadToGoId) {
-        this.roadToGoId = roadToGoId;
     }
 
     public int getCurrentx() {
@@ -108,21 +89,6 @@ public class SpecialCar {
         this.currenty = currenty;
     }
 
-    public int getCenterx() {
-        return centerx;
-    }
-
-    public void setCenterx(int centerx) {
-        this.centerx = centerx;
-    }
-
-    public int getCentery() {
-        return centery;
-    }
-
-    public void setCentery(int centery) {
-        this.centery = centery;
-    }
 
     public boolean isSpin() {
         return spin;
@@ -132,19 +98,4 @@ public class SpecialCar {
         this.spin = spin;
     }
 
-    public boolean isAfterCrossRoad() {
-        return afterCrossRoad;
-    }
-
-    public void setAfterCrossRoad(boolean afterCrossRoad) {
-        this.afterCrossRoad = afterCrossRoad;
-    }
-
-    public boolean isSendAfterCrossRoad() {
-        return sendAfterCrossRoad;
-    }
-
-    public void setSendAfterCrossRoad(boolean sendAfterCrossRoad) {
-        this.sendAfterCrossRoad = sendAfterCrossRoad;
-    }
 }

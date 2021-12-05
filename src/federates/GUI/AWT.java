@@ -111,59 +111,40 @@ public class AWT {
             g.drawLine(paramx1-pivot, paramy1-pivot, paramx1-pivot, paramy1-3*pivot);
 
             drawSubLines(g);
-            System.out.println("cars on road 1 "+carsOnRoad1.size());
-            System.out.println("cars on road 2 "+carsOnRoad2.size());
-            System.out.println("cars on road 3 "+carsOnRoad3.size());
-            System.out.println("cars on road 4 "+carsOnRoad4.size());
-            System.out.println("cars on crossroad "+carsOnCrossRoad.size());
-            System.out.println("special cars "+femab.specialCarList.size());
-            System.out.println("cars on end "+carsOnEnd.size());
 
             for(int i=0;i<=trafficColor.size();i++) {
                 drawTrafficLight(i,g);
             }
-            for(int i=0;i<carsOnRoad1.size();i++) {
-                System.out.println("cars on road 1");
-                System.out.println("cars of id "+carsOnRoad1.get(i).getCarId());
-                System.out.println("cars of road "+carsOnRoad1.get(i).getRoadId());
-                drawCar(g, carsOnRoad1.get(i),i);
-            }
-            for(int i=0;i<carsOnRoad2.size();i++) {
-                System.out.println("cars on road 2");
-                System.out.println("cars of id "+carsOnRoad2.get(i).getCarId());
-                System.out.println("cars of road "+carsOnRoad2.get(i).getRoadId());
-                drawCar(g, carsOnRoad2.get(i),i);
-            }
-            for(int i=0;i<carsOnRoad3.size();i++) {
-                System.out.println("cars on road 3");
-                System.out.println("cars of id "+carsOnRoad3.get(i).getCarId());
-                System.out.println("cars of road "+carsOnRoad3.get(i).getRoadId());
-                drawCar(g, carsOnRoad3.get(i),i);
-            }
-            for(int i=0;i<carsOnRoad4.size();i++) {
-                System.out.println("cars on road 4");
-                System.out.println("cars of id "+carsOnRoad4.get(i).getCarId());
-                System.out.println("cars of road "+carsOnRoad4.get(i).getRoadId());
-                drawCar(g, carsOnRoad4.get(i),i);
-            }
-            for(int i=0;i<carsOnEnd.size();i++) {
-                System.out.println("cars on road end");
-                System.out.println("cars of id "+carsOnEnd.get(i).getCarId());
-                System.out.println("cars of road "+carsOnEnd.get(i).getRoadId());
-                drawCarToEnd(g, carsOnEnd.get(i),i);
-            }
-            for(int i=0;i<carsOnCrossRoad.size();i++) {
-                System.out.println("cars on road cross");
-                System.out.println("cars of id "+carsOnCrossRoad.get(i).getCarId());
-                System.out.println("cars of road "+carsOnCrossRoad.get(i).getRoadId());
-                drawCar(g, carsOnCrossRoad.get(i),i);
-            }
             for(int i=0;i<femab.specialCarList.size();i++) {
                 drawSpecialCar(g, femab.specialCarList.get(i),i);
             }
+            for(int i=0;i<carsOnRoad1.size();i++) {
+                drawCar(g, carsOnRoad1.get(i),i);
+            }
+            for(int i=0;i<carsOnRoad2.size();i++) {
+                drawCar(g, carsOnRoad2.get(i),i);
+            }
+            for(int i=0;i<carsOnRoad3.size();i++) {
+                drawCar(g, carsOnRoad3.get(i),i);
+            }
+            for(int i=0;i<carsOnRoad4.size();i++) {
+                drawCar(g, carsOnRoad4.get(i),i);
+            }
+            for(int i=0;i<carsOnEnd.size();i++) {
+                drawCarToEnd(g, carsOnEnd.get(i),i);
+            }
+            for(int i=0;i<carsOnCrossRoad.size();i++) {
+                drawCar(g, carsOnCrossRoad.get(i),i);
+            }
+
         }
 
         private void drawSpecialCar(Graphics g, SpecialCar specialCar, int i) {
+
+            if(specialCar.getCurrentx()<-400||specialCar.getCurrentx()>1600||specialCar.getCurrenty()<-400||specialCar.getCurrenty()>1600){
+                femab.specialCarList.remove(specialCar);
+                return;
+            }
 
                     switch (specialCar.getRoadId()){
                         case 0:
@@ -366,26 +347,519 @@ public class AWT {
 
         public void drawCarToEnd(Graphics g, Car car, int carOfNumber) {
 
+
+            for (int i=0; i<femab.specialCarList.size();i++){
+                if(car.getCarMoved()<8&&((car.getCurrentx()<600+75&&car.getCurrentx()>600-75) && (car.getCurrenty()<600+75&&car.getCurrenty()>600-75))&&((car.getCurrentx()<femab.specialCarList.get(i).getCurrentx()+150&&car.getCurrentx()>femab.specialCarList.get(i).getCurrentx()-150) && (car.getCurrenty()<femab.specialCarList.get(i).getCurrenty()+150&&car.getCurrenty()>femab.specialCarList.get(i).getCurrenty()-150))) {
+                    if(car.getCenterx()>525&&car.getCenterx()<600&&car.getCentery()<675&&car.getCentery()>600){//lewwy dolny
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                        }
+                    }else if(car.getCenterx()>525&&car.getCenterx()<600&&car.getCentery()<600&&car.getCentery()>525){//lewy gorny
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                        }
+                    }else if(car.getCenterx()>600&&car.getCenterx()<675&&car.getCentery()<600&&car.getCentery()>525){//prawy grony
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                        }
+                    }else if(car.getCenterx()>600&&car.getCenterx()<675&&car.getCentery()<675&&car.getCentery()>600){//prawy dolny
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                        }
+                    }
+                    car.addCarMoved();
+                } else if(car.getCarMoved()<5&&((car.getCurrentx()<femab.specialCarList.get(i).getCurrentx()+150&&car.getCurrentx()>femab.specialCarList.get(i).getCurrentx()-150) && (car.getCurrenty()<femab.specialCarList.get(i).getCurrenty()+150&&car.getCurrenty()>femab.specialCarList.get(i).getCurrenty()-150))){
+
+                    switch (car.getRoadId()){
+                        case 0:
+                            if(car.getRoadToGo()==2){
+                                driveToRoad1(g, car);
+                                car.setCurrentx(car.getCurrentx()-6);
+                                addCor(6,0, false, false,car);
+                                car.setDriveTo(0);
+                            } else if(car.getRoadToGo()==3){
+                                if(car.getCurrenty()>=535){
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }else{
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }
+                            }else if(car.getRoadToGo()==1){
+                                if (car.getCurrenty() >= 610) {
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                } else {
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }
+                            }
+
+                            break;
+                        case 1:
+                            if(car.getRoadToGo()==3){
+                                driveToRoad2(g, car);
+                                car.setCurrenty(car.getCurrenty()-6);
+                                addCor(0,6, false, false,car);
+                                car.setDriveTo(1);
+                            } else if(car.getRoadToGo()==0){
+                                if(car.getCurrentx()<=610){
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, false,car);
+                                    car.setDriveTo(2);
+                                }else{
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }
+                            }else if(car.getRoadToGo()==2){
+                                if(car.getCurrentx()<=535){
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }else{
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }
+                            }
+                            break;
+                        case 2:
+                            if(car.getRoadToGo()==0){
+                                driveToRoad3(g, car);
+                                car.setCurrentx(car.getCurrentx()+6);
+                                addCor(6,0, true, false,car);
+                                car.setDriveTo(2);
+                            } else if(car.getRoadToGo()==1){
+                                if(car.getCurrenty()<=610){
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                }else{
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, false,car);
+                                    car.setDriveTo(2);
+                                }
+                            }else if(car.getRoadToGo()==3){
+                                if(car.getCurrenty()<=535){
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }else{
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, false,car);
+                                    car.setDriveTo(2);
+                                }
+                            }
+                            break;
+                        case 3:
+                            if(car.getRoadToGo()==1){
+                                driveToRoad4(g, car);
+                                car.setCurrenty(car.getCurrenty() + 6);
+                                addCor(0,6, false, true,car);
+                                car.setDriveTo(3);
+                            } else if(car.getRoadToGo()==2){
+                                if(car.getCurrentx()>=535){
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }else{
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                }
+                            }else if(car.getRoadToGo()==0){
+                                if(car.getCurrentx()>=610){
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, true,car);
+                                    car.setDriveTo(2);
+                                }else{
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                }
+                            }
+                            break;
+                    }
+                        car.addCarMoved();
+                    return;
+                }else if (((car.getCurrentx()<femab.specialCarList.get(i).getCurrentx()+150&&car.getCurrentx()>femab.specialCarList.get(i).getCurrentx()-150) && (car.getCurrenty()<femab.specialCarList.get(i).getCurrenty()+150&&car.getCurrenty()>femab.specialCarList.get(i).getCurrenty()-150))){
+                    switch (car.getDriveTo()){
+                        case 0:
+                            driveToRoad1(g,car);
+                            break;
+                        case 1:
+                            driveToRoad2(g,car);
+                            break;
+                        case 2:
+                            driveToRoad3(g,car);
+                            break;
+                        case 3:
+                            driveToRoad4(g,car);
+                            break;
+                    }
+                    return;
+                }else if(car.getCarMoved()>0){
+                    switch (car.getDriveTo()){
+                        case 0:
+                            driveToRoad1(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                        case 1:
+                            driveToRoad2(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                        case 2:
+                            driveToRoad3(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                        case 3:
+                            driveToRoad4(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                    }
+                    car.subCarMoved();
+                    return;
+                }
+            }
+            //car.nowx+=1;
+            for (int i=0;i<carsOnCrossRoad.size();i++) {
+                if((carsOnCrossRoad.get(i).getCurrentx()<450 || carsOnCrossRoad.get(i).getCurrentx()>750) || (carsOnCrossRoad.get(i).getCurrenty()<450 || carsOnCrossRoad.get(i).getCurrenty()>750)){
+                    carsOnEnd.add(carsOnCrossRoad.get(i));
+                    carsOnCrossRoad.remove(carsOnCrossRoad.get(i));
+                }
+            }
+            for (int i=0;i<carsOnEnd.size();i++) {
+                if((carsOnEnd.get(i).getCurrentx()<-60 || carsOnEnd.get(i).getCurrentx()>1260) || (carsOnEnd.get(i).getCurrenty()<-60 || carsOnEnd.get(i).getCurrenty()>1260)){
+                    femab.carList.get(carsOnEnd.get(i).getCarId()).setAfterCrossRoad(true);
+                    carsOnEnd.remove(carsOnEnd.get(i));
+                }
+            }
+            if(car.isOnTraffic()) {
+                for (int i = 0; i < carsOnCrossRoad.size(); i++) {
+                    switch (car.getRoadId()) {
+                        case 0:
+                            if (carsOnCrossRoad.get(i).getRoadId() == 1 || (carsOnCrossRoad.get(i).getRoadId() == 2 && carsOnCrossRoad.get(i).getRoadToGo() == 3)) {
+                                driveToRoad1(g, car);
+                                return;
+                            }
+                            break;
+                        case 1:
+                            if (carsOnCrossRoad.get(i).getRoadId() == 2 || (carsOnCrossRoad.get(i).getRoadId() == 3 && carsOnCrossRoad.get(i).getRoadToGo() == 0)) {
+                                driveToRoad2(g, car);
+                                return;
+                            }
+                            break;
+                        case 2:
+                            if (carsOnCrossRoad.get(i).getRoadId() == 3 || (carsOnCrossRoad.get(i).getRoadId() == 0 && carsOnCrossRoad.get(i).getRoadToGo() == 1)) {
+                                driveToRoad3(g, car);
+                                return;
+                            }
+                            break;
+                        case 3:
+                            if (carsOnCrossRoad.get(i).getRoadId() == 0 || (carsOnCrossRoad.get(i).getRoadId() == 1 && carsOnCrossRoad.get(i).getRoadToGo() == 2)) {
+                                driveToRoad4(g, car);
+                                return;
+                            }
+                            break;
+                    }
+                }
+            }
+            if(car.isAfterTraffic()){
+                switch (car.getRoadId()){
+                    case 0:
+                        if(car.getRoadToGo()==2){
+                            driveToRoad1(g, car);
+                            car.setCurrenty(car.getCurrenty()+6);
+                            car.setDriveTo(0);
+                        } else if(car.getRoadToGo()==3){
+                            if(car.getCurrenty()>=535){
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-6);
+                                car.setDriveTo(1);
+                            }else{
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty()+6);
+                                car.setDriveTo(0);
+                            }
+                        }else if(car.getRoadToGo()==1){
+                            if (car.getCurrenty() >= 610) {
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx() + 6);
+                                car.setDriveTo(3);
+                            } else {
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty() + 6);
+                                car.setDriveTo(0);
+                            }
+                        }
+
+                        break;
+                    case 1:
+                        if(car.getRoadToGo()==3){
+                            driveToRoad2(g, car);
+                            car.setCurrentx(car.getCurrentx()-6);
+                            car.setDriveTo(1);
+                        } else if(car.getRoadToGo()==0){
+                            if(car.getCurrentx()<=610){
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-6);
+                                car.setDriveTo(2);
+                            }else{
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-6);
+                                car.setDriveTo(1);
+                            }
+                        }else if(car.getRoadToGo()==2){
+                            if(car.getCurrentx()<=535){
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty()+6);
+                                car.setDriveTo(0);
+                            }else{
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-6);
+                                car.setDriveTo(1);
+                            }
+                        }
+                        break;
+                    case 2:
+                        if(car.getRoadToGo()==0){
+                            driveToRoad3(g, car);
+                            car.setCurrenty(car.getCurrenty()-6);
+                            car.setDriveTo(2);
+                        } else if(car.getRoadToGo()==1){
+                            if(car.getCurrenty()<=610){
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx()+6);
+                                car.setDriveTo(3);
+                            }else{
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-6);
+                                car.setDriveTo(2);
+                            }
+                        }else if(car.getRoadToGo()==3){
+                            if(car.getCurrenty()<=535){
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-6);
+                                car.setDriveTo(1);
+                            }else{
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-6);
+                                car.setDriveTo(2);
+                            }
+                        }
+                        break;
+                    case 3:
+                        if(car.getRoadToGo()==1){
+                            driveToRoad4(g, car);
+                            car.setCurrentx(car.getCurrentx()+6);
+                            car.setDriveTo(3);
+                        } else if(car.getRoadToGo()==2){
+                            if(car.getCurrentx()>=535){
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty()+6);
+                                car.setDriveTo(0);
+                            }else{
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx()+6);
+                                car.setDriveTo(3);
+                            }
+                        }else if(car.getRoadToGo()==0){
+                            if(car.getCurrentx()>=610){
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-6);
+                                car.setDriveTo(2);
+                            }else{
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx()+6);
+                                car.setDriveTo(3);
+                            }
+                        }
+                        break;
+                }
+            }
+
                 switch (car.getRoadId()){
                     case 0:
                         if(car.getRoadToGo()==2){
                             driveToRoad1(g, car);
                             car.setCurrenty(car.getCurrenty()+3);
+                            car.setDriveTo(0);
                         } else if(car.getRoadToGo()==3){
                             if(car.getCurrenty()>=535){
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-3);
+                                car.setDriveTo(1);
                             }else{
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty()+3);
+                                car.setDriveTo(0);
                             }
                         }else if(car.getRoadToGo()==1){
                             if (car.getCurrenty() >= 610) {
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx() + 3);
+                                car.setDriveTo(3);
                             } else {
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty() + 3);
+                                car.setDriveTo(0);
                             }
                         }
 
@@ -394,21 +868,26 @@ public class AWT {
                         if(car.getRoadToGo()==3){
                             driveToRoad2(g, car);
                             car.setCurrentx(car.getCurrentx()-3);
+                            car.setDriveTo(1);
                         } else if(car.getRoadToGo()==0){
                             if(car.getCurrentx()<=610){
                                 driveToRoad3(g, car);
                                 car.setCurrenty(car.getCurrenty()-3);
+                                car.setDriveTo(2);
                             }else{
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-3);
+                                car.setDriveTo(1);
                             }
                         }else if(car.getRoadToGo()==2){
                             if(car.getCurrentx()<=535){
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty()+3);
+                                car.setDriveTo(0);
                             }else{
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-3);
+                                car.setDriveTo(1);
                             }
                         }
                         break;
@@ -416,21 +895,26 @@ public class AWT {
                         if(car.getRoadToGo()==0){
                             driveToRoad3(g, car);
                             car.setCurrenty(car.getCurrenty()-3);
+                            car.setDriveTo(2);
                         } else if(car.getRoadToGo()==1){
                             if(car.getCurrenty()<=610){
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx()+3);
+                                car.setDriveTo(3);
                             }else{
                                 driveToRoad3(g, car);
                                 car.setCurrenty(car.getCurrenty()-3);
+                                car.setDriveTo(2);
                             }
                         }else if(car.getRoadToGo()==3){
                             if(car.getCurrenty()<=535){
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-3);
+                                car.setDriveTo(1);
                             }else{
                                 driveToRoad3(g, car);
                                 car.setCurrenty(car.getCurrenty()-3);
+                                car.setDriveTo(2);
                             }
                         }
                         break;
@@ -438,21 +922,26 @@ public class AWT {
                         if(car.getRoadToGo()==1){
                             driveToRoad4(g, car);
                             car.setCurrentx(car.getCurrentx()+3);
+                            car.setDriveTo(3);
                         } else if(car.getRoadToGo()==2){
                             if(car.getCurrentx()>=535){
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty()+3);
+                                car.setDriveTo(0);
                             }else{
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx()+3);
+                                car.setDriveTo(3);
                             }
                         }else if(car.getRoadToGo()==0){
                             if(car.getCurrentx()>=610){
                                 driveToRoad3(g, car);
                                 car.setCurrenty(car.getCurrenty()-3);
+                                car.setDriveTo(2);
                             }else{
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx()+3);
+                                car.setDriveTo(3);
                             }
                         }
                         break;
@@ -461,8 +950,337 @@ public class AWT {
 
 
         public void drawCar(Graphics g, Car car, int carOfNumber) {
-            //car.nowx+=1;
 
+            for (int i=0; i<femab.specialCarList.size();i++){
+                if(car.getCarMoved()<8&&((car.getCurrentx()<600+75&&car.getCurrentx()>600-75) && (car.getCurrenty()<600+75&&car.getCurrenty()>600-75))&&((car.getCurrentx()<femab.specialCarList.get(i).getCurrentx()+150&&car.getCurrentx()>femab.specialCarList.get(i).getCurrentx()-150) && (car.getCurrenty()<femab.specialCarList.get(i).getCurrenty()+150&&car.getCurrenty()>femab.specialCarList.get(i).getCurrenty()-150))) {
+                    if(car.getCenterx()>525&&car.getCenterx()<600&&car.getCentery()<675&&car.getCentery()>600){//lewwy dolny
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, true,car);
+                                break;
+                        }
+                    }else if(car.getCenterx()>525&&car.getCenterx()<600&&car.getCentery()<600&&car.getCentery()>525){//lewy gorny
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()-8);
+                                addCor(8,8, false, false,car);
+                                break;
+                        }
+                    }else if(car.getCenterx()>600&&car.getCenterx()<675&&car.getCentery()<600&&car.getCentery()>525){//prawy grony
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()-8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, false,car);
+                                break;
+                        }
+                    }else if(car.getCenterx()>600&&car.getCenterx()<675&&car.getCentery()<675&&car.getCentery()>600){//prawy dolny
+                        switch (car.getDriveTo()){
+                            case 0:
+                                driveToRoad1(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                            case 1:
+                                driveToRoad2(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                            case 2:
+                                driveToRoad3(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                            case 3:
+                                driveToRoad4(g,car);
+                                car.setCurrenty(car.getCurrenty()+8);
+                                car.setCurrentx(car.getCurrentx()+8);
+                                addCor(8,8, true, true,car);
+                                break;
+                        }
+                    }
+                    car.addCarMoved();
+                } else if(car.getCarMoved()<5&&((car.getCurrentx()<femab.specialCarList.get(i).getCurrentx()+150&&car.getCurrentx()>femab.specialCarList.get(i).getCurrentx()-150) && (car.getCurrenty()<femab.specialCarList.get(i).getCurrenty()+150&&car.getCurrenty()>femab.specialCarList.get(i).getCurrenty()-150))){
+                    switch (car.getRoadId()){
+                        case 0:
+                            if(car.getRoadToGo()==2){
+                                driveToRoad1(g, car);
+                                car.setCurrentx(car.getCurrentx()-6);
+                                addCor(6,0, false, false,car);
+                                car.setDriveTo(0);
+                            } else if(car.getRoadToGo()==3){
+                                if(car.getCurrenty()>=535){
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }else{
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }
+                            }else if(car.getRoadToGo()==1){
+                                if (car.getCurrenty() >= 610) {
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                } else {
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }
+                            }
+
+                            break;
+                        case 1:
+                            if(car.getRoadToGo()==3){
+                                driveToRoad2(g, car);
+                                car.setCurrenty(car.getCurrenty()-6);
+                                addCor(0,6, false, false,car);
+                                car.setDriveTo(1);
+                            } else if(car.getRoadToGo()==0){
+                                if(car.getCurrentx()<=610){
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, false,car);
+                                    car.setDriveTo(2);
+                                }else{
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }
+                            }else if(car.getRoadToGo()==2){
+                                if(car.getCurrentx()<=535){
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }else{
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }
+                            }
+                            break;
+                        case 2:
+                            if(car.getRoadToGo()==0){
+                                driveToRoad3(g, car);
+                                car.setCurrentx(car.getCurrentx()+6);
+                                addCor(6,0, true, false,car);
+                                car.setDriveTo(2);
+                            } else if(car.getRoadToGo()==1){
+                                if(car.getCurrenty()<=610){
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                }else{
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, false,car);
+                                    car.setDriveTo(2);
+                                }
+                            }else if(car.getRoadToGo()==3){
+                                if(car.getCurrenty()<=535){
+                                    driveToRoad2(g, car);
+                                    car.setCurrenty(car.getCurrenty()-6);
+                                    addCor(0,6, false, false,car);
+                                    car.setDriveTo(1);
+                                }else{
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, false,car);
+                                    car.setDriveTo(2);
+                                }
+                            }
+                            break;
+                        case 3:
+                            if(car.getRoadToGo()==1){
+                                driveToRoad4(g, car);
+                                car.setCurrenty(car.getCurrenty() + 6);
+                                addCor(0,6, false, true,car);
+                                car.setDriveTo(3);
+                            } else if(car.getRoadToGo()==2){
+                                if(car.getCurrentx()>=535){
+                                    driveToRoad1(g, car);
+                                    car.setCurrentx(car.getCurrentx()-6);
+                                    addCor(6,0, false, false,car);
+                                    car.setDriveTo(0);
+                                }else{
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                }
+                            }else if(car.getRoadToGo()==0){
+                                if(car.getCurrentx()>=610){
+                                    driveToRoad3(g, car);
+                                    car.setCurrentx(car.getCurrentx()+6);
+                                    addCor(6,0, true, true,car);
+                                    car.setDriveTo(2);
+                                }else{
+                                    driveToRoad4(g, car);
+                                    car.setCurrenty(car.getCurrenty() + 6);
+                                    addCor(0,6, false, true,car);
+                                    car.setDriveTo(3);
+                                }
+                            }
+                            break;
+                    }
+                    car.addCarMoved();
+                    return;
+                }else if (((car.getCurrentx()<femab.specialCarList.get(i).getCurrentx()+150&&car.getCurrentx()>femab.specialCarList.get(i).getCurrentx()-150) && (car.getCurrenty()<femab.specialCarList.get(i).getCurrenty()+150&&car.getCurrenty()>femab.specialCarList.get(i).getCurrenty()-150))){
+                    switch (car.getDriveTo()){
+                        case 0:
+                            driveToRoad1(g,car);
+                            break;
+                        case 1:
+                            driveToRoad2(g,car);
+                            break;
+                        case 2:
+                            driveToRoad3(g,car);
+                            break;
+                        case 3:
+                            driveToRoad4(g,car);
+                            break;
+                    }
+                    return;
+                }else if(car.getCarMoved()>0){
+                    switch (car.getDriveTo()){
+                        case 0:
+                            driveToRoad1(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                        case 1:
+                            driveToRoad2(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                        case 2:
+                            driveToRoad3(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                        case 3:
+                            driveToRoad4(g,car);
+                            if(car.getAddedsignx()[car.getCarMoved()-1]){
+                                car.setCurrentx(car.getCurrentx()-car.getAddedx()[car.getCarMoved()-1]);
+
+                            }else{
+                                car.setCurrentx(car.getCurrentx()+car.getAddedx()[car.getCarMoved()-1]);
+                            }
+                            if(car.getAddedsigny()[car.getCarMoved()-1]){
+                                car.setCurrenty(car.getCurrenty()-car.getAddedy()[car.getCarMoved()-1]);
+                            }else{
+                                car.setCurrenty(car.getCurrenty()+car.getAddedy()[car.getCarMoved()-1]);
+                            }
+                            addCor(0,0,false,false,car);
+                            break;
+                    }
+                    car.subCarMoved();
+                    return;
+                }
+            }
+            //car.nowx+=1;
             for (int i=0;i<carsOnCrossRoad.size();i++) {
                 if((carsOnCrossRoad.get(i).getCurrentx()<450 || carsOnCrossRoad.get(i).getCurrentx()>750) || (carsOnCrossRoad.get(i).getCurrenty()<450 || carsOnCrossRoad.get(i).getCurrenty()>750)){
                     carsOnEnd.add(carsOnCrossRoad.get(i));
@@ -511,21 +1329,26 @@ public class AWT {
                             if(car.getRoadToGo()==2){
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty()+6);
+                                car.setDriveTo(0);
                             } else if(car.getRoadToGo()==3){
                                 if(car.getCurrenty()>=535){
                                     driveToRoad2(g, car);
                                     car.setCurrentx(car.getCurrentx()-6);
+                                    car.setDriveTo(1);
                                 }else{
                                     driveToRoad1(g, car);
                                     car.setCurrenty(car.getCurrenty()+6);
+                                    car.setDriveTo(0);
                                 }
                             }else if(car.getRoadToGo()==1){
                                     if (car.getCurrenty() >= 610) {
                                         driveToRoad4(g, car);
                                         car.setCurrentx(car.getCurrentx() + 6);
+                                        car.setDriveTo(3);
                                     } else {
                                         driveToRoad1(g, car);
                                         car.setCurrenty(car.getCurrenty() + 6);
+                                        car.setDriveTo(0);
                                     }
                             }
 
@@ -534,21 +1357,26 @@ public class AWT {
                             if(car.getRoadToGo()==3){
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-6);
+                                car.setDriveTo(1);
                             } else if(car.getRoadToGo()==0){
                                 if(car.getCurrentx()<=610){
                                     driveToRoad3(g, car);
                                     car.setCurrenty(car.getCurrenty()-6);
+                                    car.setDriveTo(2);
                                 }else{
                                     driveToRoad2(g, car);
                                     car.setCurrentx(car.getCurrentx()-6);
+                                    car.setDriveTo(1);
                                 }
                             }else if(car.getRoadToGo()==2){
                                 if(car.getCurrentx()<=535){
                                     driveToRoad1(g, car);
                                     car.setCurrenty(car.getCurrenty()+6);
+                                    car.setDriveTo(0);
                                 }else{
                                     driveToRoad2(g, car);
                                     car.setCurrentx(car.getCurrentx()-6);
+                                    car.setDriveTo(1);
                                 }
                             }
                         break;
@@ -556,21 +1384,26 @@ public class AWT {
                         if(car.getRoadToGo()==0){
                             driveToRoad3(g, car);
                             car.setCurrenty(car.getCurrenty()-6);
+                            car.setDriveTo(2);
                         } else if(car.getRoadToGo()==1){
                             if(car.getCurrenty()<=610){
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx()+6);
+                                car.setDriveTo(3);
                             }else{
                                 driveToRoad3(g, car);
                                 car.setCurrenty(car.getCurrenty()-6);
+                                car.setDriveTo(2);
                             }
                         }else if(car.getRoadToGo()==3){
                                 if(car.getCurrenty()<=535){
                                     driveToRoad2(g, car);
                                     car.setCurrentx(car.getCurrentx()-6);
+                                    car.setDriveTo(1);
                                 }else{
                                     driveToRoad3(g, car);
                                     car.setCurrenty(car.getCurrenty()-6);
+                                    car.setDriveTo(2);
                                 }
                 }
                         break;
@@ -578,21 +1411,26 @@ public class AWT {
                         if(car.getRoadToGo()==1){
                             driveToRoad4(g, car);
                             car.setCurrentx(car.getCurrentx()+6);
+                            car.setDriveTo(3);
                         } else if(car.getRoadToGo()==2){
                             if(car.getCurrentx()>=535){
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty()+6);
+                                car.setDriveTo(0);
                             }else{
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx()+6);
+                                car.setDriveTo(3);
                             }
                         }else if(car.getRoadToGo()==0){
                                 if(car.getCurrentx()>=610){
                                     driveToRoad3(g, car);
                                     car.setCurrenty(car.getCurrenty()-6);
+                                    car.setDriveTo(2);
                                 }else{
                                     driveToRoad4(g, car);
                                     car.setCurrentx(car.getCurrentx()+6);
+                                    car.setDriveTo(3);
                                 }
                         }
                         break;
@@ -605,36 +1443,37 @@ public class AWT {
                             if(car.getRoadToGo()==2){
                                 driveToRoad1(g, car);
                                 car.setCurrenty(car.getCurrenty()+6);
+                                car.setDriveTo(0);
                                 ChangeState(car);
                                 carsOnRoad1.remove(car);
                             } else if(car.getRoadToGo()==3){
                                 if(car.getCurrenty()>=535){
                                     driveToRoad2(g, car);
                                     car.setCurrentx(car.getCurrentx()-6);
+                                    car.setDriveTo(1);
                                     ChangeState(car);
                                     carsOnRoad1.remove(car);
                                 }else{
                                     driveToRoad1(g, car);
                                     car.setCurrenty(car.getCurrenty()+6);
+                                    car.setDriveTo(0);
                                     ChangeState(car);
                                     carsOnRoad1.remove(car);
                                 }
                             }else if(car.getRoadToGo()==1){
-//                                if(carsOnRoad3.size()>0&&(carsOnRoad3.get(0).getRoadToGo()==0||carsOnRoad3.get(0).getRoadToGo()==1) &&carsOnRoad3.get(0).getCurrenty()<950){
-//                                    driveToRoad1(g, car);
-//                                }else{
                                     if(car.getCurrenty()>=610){
                                         driveToRoad4(g, car);
                                         car.setCurrentx(car.getCurrentx()+6);
+                                        car.setDriveTo(3);
                                         ChangeState(car);
                                         carsOnRoad1.remove(car);
                                     }else{
                                         driveToRoad1(g, car);
                                         car.setCurrenty(car.getCurrenty()+6);
+                                        car.setDriveTo(0);
                                         ChangeState(car);
                                         carsOnRoad1.remove(car);
                                     }
-//                                }
                             }
                         }else{
                             driveToRoad1(g, car);
@@ -645,36 +1484,37 @@ public class AWT {
                             if(car.getRoadToGo()==3){
                                 driveToRoad2(g, car);
                                 car.setCurrentx(car.getCurrentx()-6);
+                                car.setDriveTo(1);
                                 ChangeState(car);
                                 carsOnRoad2.remove(car);
                             } else if(car.getRoadToGo()==0){
                                 if(car.getCurrentx()<=610){
                                     driveToRoad3(g, car);
                                     car.setCurrenty(car.getCurrenty()-6);
+                                    car.setDriveTo(2);
                                     ChangeState(car);
                                     carsOnRoad2.remove(car);
                                 }else{
                                     driveToRoad2(g, car);
                                     car.setCurrentx(car.getCurrentx()-6);
+                                    car.setDriveTo(1);
                                     ChangeState(car);
                                     carsOnRoad2.remove(car);
                                 }
                             }else if(car.getRoadToGo()==2){
-//                                if(carsOnRoad4.size()>0&& carsOnRoad3.size()>0&&(carsOnRoad4.get(0).getRoadToGo()==1||carsOnRoad3.get(0).getRoadToGo()==2) &&carsOnRoad3.get(0).getCurrentx()>350){
-//                                    driveToRoad2(g, car);
-//                                }else{
                                     if(car.getCurrentx()<=535){
                                         driveToRoad3(g, car);
                                         car.setCurrenty(car.getCurrenty()+6);
+                                        car.setDriveTo(2);
                                         ChangeState(car);
                                         carsOnRoad2.remove(car);
                                     }else{
                                         driveToRoad2(g, car);
                                         car.setCurrentx(car.getCurrentx()-6);
+                                        car.setDriveTo(1);
                                         ChangeState(car);
                                         carsOnRoad2.remove(car);
                                     }
-//                                }
                             }
                         }else{
                             driveToRoad2(g, car);
@@ -685,17 +1525,20 @@ public class AWT {
                             if(car.getRoadToGo()==0){
                                 driveToRoad3(g, car);
                                 car.setCurrenty(car.getCurrenty()-6);
+                                car.setDriveTo(2);
                                 ChangeState(car);
                                 carsOnRoad3.remove(car);
                             } else if(car.getRoadToGo()==1){
                                 if(car.getCurrenty()<=610){
                                     driveToRoad4(g, car);
                                     car.setCurrentx(car.getCurrentx()+6);
+                                    car.setDriveTo(3);
                                     ChangeState(car);
                                     carsOnRoad3.remove(car);
                                 }else{
                                     driveToRoad3(g, car);
                                     car.setCurrenty(car.getCurrenty()-6);
+                                    car.setDriveTo(2);
                                     ChangeState(car);
                                     carsOnRoad3.remove(car);
                                 }
@@ -703,11 +1546,13 @@ public class AWT {
                                 if(car.getCurrenty()<=535){
                                     driveToRoad2(g, car);
                                     car.setCurrentx(car.getCurrentx()-6);
+                                    car.setDriveTo(1);
                                     ChangeState(car);
                                     carsOnRoad3.remove(car);
                                 }else{
                                     driveToRoad3(g, car);
                                     car.setCurrenty(car.getCurrenty()-6);
+                                    car.setDriveTo(2);
                                     ChangeState(car);
                                     carsOnRoad3.remove(car);
                                 }
@@ -721,6 +1566,7 @@ public class AWT {
                             if(car.getRoadToGo()==1){
                                 driveToRoad4(g, car);
                                 car.setCurrentx(car.getCurrentx()+6);
+                                car.setDriveTo(3);
                                 ChangeState(car);
                                 carsOnRoad4.remove(car);
 
@@ -728,11 +1574,13 @@ public class AWT {
                                 if(car.getCurrentx()>=535){
                                     driveToRoad1(g, car);
                                     car.setCurrenty(car.getCurrenty()+6);
+                                    car.setDriveTo(0);
                                     ChangeState(car);
                                     carsOnRoad4.remove(car);
                                 }else{
                                     driveToRoad4(g, car);
                                     car.setCurrentx(car.getCurrentx()+6);
+                                    car.setDriveTo(3);
                                     ChangeState(car);
                                     carsOnRoad4.remove(car);
                                 }
@@ -740,11 +1588,13 @@ public class AWT {
                                 if(car.getCurrentx()>=610){
                                     driveToRoad3(g, car);
                                     car.setCurrenty(car.getCurrenty()-6);
+                                    car.setDriveTo(2);
                                     ChangeState(car);
                                     carsOnRoad4.remove(car);
                                 }else{
                                     driveToRoad4(g, car);
                                     car.setCurrentx(car.getCurrentx()+6);
+                                    car.setDriveTo(3);
                                     ChangeState(car);
                                     carsOnRoad4.remove(car);
                                 }
@@ -760,6 +1610,7 @@ public class AWT {
                         driveToRoad1(g, car);
                         if(carOfNumber!=0 && carsOnRoad1.get(carOfNumber-1).getCurrenty()>carsOnRoad1.get(carOfNumber).getCurrenty()+50+30){
                             car.setCurrenty(car.getCurrenty()+3);
+                            car.setDriveTo(0);
                             femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setInQueue(false);
                             femab.carList.get(carsOnRoad1.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }else if (carOfNumber==0) {
@@ -779,6 +1630,7 @@ public class AWT {
                         driveToRoad2(g, car);
                         if(carOfNumber!=0 && carsOnRoad2.get(carOfNumber-1).getCurrentx()<carsOnRoad2.get(carOfNumber).getCurrentx()-50-30){
                             car.setCurrentx(car.getCurrentx()-3);
+                            car.setDriveTo(1);
                             femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setInQueue(false);
                             femab.carList.get(carsOnRoad2.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }else if (carOfNumber==0) car.setCurrentx(car.getCurrentx()-3);
@@ -797,6 +1649,7 @@ public class AWT {
                         driveToRoad3(g, car);
                         if(carOfNumber!=0 && carsOnRoad3.get(carOfNumber-1).getCurrenty()<carsOnRoad3.get(carOfNumber).getCurrenty()-30-50){
                             car.setCurrenty(car.getCurrenty()-3);
+                            car.setDriveTo(2);
                             femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setInQueue(false);
                             femab.carList.get(carsOnRoad3.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }else if (carOfNumber==0) car.setCurrenty(car.getCurrenty()-3);
@@ -815,6 +1668,7 @@ public class AWT {
                         driveToRoad4(g, car);
                         if(carOfNumber!=0 && carsOnRoad4.get(carOfNumber-1).getCurrentx()>carsOnRoad4.get(carOfNumber).getCurrentx()+50+30){
                             car.setCurrentx(car.getCurrentx()+3);
+                            car.setDriveTo(3);
                             femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setInQueue(false);
                             femab.carList.get(carsOnRoad4.get(carOfNumber).getCarId()).setWaitTime(femab.getTime());
                         }else if (carOfNumber==0) car.setCurrentx(car.getCurrentx()+3);
@@ -893,15 +1747,6 @@ public class AWT {
             if(!carsOnCrossRoad.contains(car)) {
                 carsOnCrossRoad.add(car);
             }
-//            if(car.getRoadId()==0 && car.getRoadToGo()!=3 && !carsOnCrossRoad.contains(car)) {
-//                carsOnCrossRoad.add(car);
-//            }
-//            if(car.getRoadId()-1!=car.getRoadToGo() && car.getRoadId()!=0 && !carsOnCrossRoad.contains(car)) {
-//                carsOnCrossRoad.add(car);
-//            }
-//            if(!carsOnEnd.contains(car) && (car.getCurrentx()<500 || car.getCurrentx()>700) || (car.getCurrenty()<400 || car.getCurrenty()>700)) {
-//                carsOnEnd.add(car);
-//            }
         }
         public void driveSpecialToRoad1(Graphics g, SpecialCar car){
             g.setColor(Color.BLACK);
@@ -987,6 +1832,12 @@ public class AWT {
                 car.setSpin(true);
             }
             g.setColor(Color.BLACK);
+        }
+        public void addCor(int x, int y,boolean xsign, boolean ysign, Car car){
+            car.addAddedx(x,car.getCarMoved());
+            car.addAddedy(y,car.getCarMoved());
+            car.setAddedsignx(car.getCarMoved(),xsign);
+            car.setAddedsigny(car.getCarMoved(),ysign);
         }
     }
 }

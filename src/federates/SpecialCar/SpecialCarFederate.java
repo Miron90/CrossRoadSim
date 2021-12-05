@@ -139,6 +139,7 @@ public class SpecialCarFederate extends BaseFederate{
         }
         boolean carSpawned=false;
         double timeSpawned=-999;
+        boolean start=true;
 
         /////////////////////////////
         // 7. enable time policies //
@@ -167,7 +168,15 @@ public class SpecialCarFederate extends BaseFederate{
 
         while( fedamb.federateTime<SIM_TIME )
         {
-            if(rand.nextInt(SPECIAL_CAR_SPAWN_RATE)==0 && !carSpawned && timeSpawned+120<fedamb.federateTime){
+            if(start){
+                ObjectInstanceHandle specialCarObjectHandle = rtiamb.registerObjectInstance(specialCarHandle);
+                //carList.add();
+                updateSpecialCar(new SpecialCar(specialCars, specialCarObjectHandle, rand.nextInt(4)));
+                specialCars++;
+                carSpawned=true;
+                start=false;
+                log("Registered Special Car, handle=" + specialCarObjectHandle);
+            }else if(rand.nextInt(SPECIAL_CAR_SPAWN_RATE)==0 && !carSpawned && timeSpawned+160<fedamb.federateTime){
                 ObjectInstanceHandle specialCarObjectHandle = rtiamb.registerObjectInstance(specialCarHandle);
                 //carList.add();
                 updateSpecialCar(new SpecialCar(specialCars, specialCarObjectHandle, rand.nextInt(4)));

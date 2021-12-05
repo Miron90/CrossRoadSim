@@ -27,10 +27,6 @@ public class Road {
         return roadObjectId;
     }
 
-    public void setRoadObjectId(ObjectInstanceHandle roadObjectId) {
-        this.roadObjectId = roadObjectId;
-    }
-
     public int getRoadId() {
         return roadId;
     }

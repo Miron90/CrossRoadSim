@@ -16,7 +16,6 @@ public class Car {
     private boolean isInQueue = false;
 
     private boolean afterTraffic = false;
-    private boolean sendAfterTraffic = false;
 
     private boolean afterCrossRoad = false;
     private boolean sendAfterCrossRoad = false;
@@ -28,8 +27,12 @@ public class Car {
     private int currenty;
     private int trafficx;
     private int trafficy;
-    private int beforeNextCarx;
-    private int beforeNextCary;
+    private int carMoved=0;
+    private int driveTo=0;
+    private int[] addedx=new int[10];
+    private int[] addedy=new int[10];
+    private boolean[] addedsignx= new boolean[10];
+    private boolean[] addedsigny=new boolean[10];
 
     private int carOnThisRoad;
     private double waitTime;
@@ -51,25 +54,16 @@ public class Car {
         return roadToGo;
     }
 
-    public void setRoadToGo(int roadToGo) {
-        this.roadToGo = roadToGo;
-    }
 
     public int getCarId() {
         return carId;
     }
 
-    public void setCarId(int carId) {
-        this.carId = carId;
-    }
 
     public ObjectInstanceHandle getCarObjectId() {
         return carObjectId;
     }
 
-    public void setCarObjectId(ObjectInstanceHandle carObjectId) {
-        this.carObjectId = carObjectId;
-    }
 
     public int getRoadId() {
         return roadId;
@@ -151,28 +145,21 @@ public class Car {
         isInQueue = inQueue;
     }
 
-    public int getCarOnThisRoad() {
-        return carOnThisRoad;
+
+    public boolean[] getAddedsignx() {
+        return addedsignx;
     }
 
-    public void setCarOnThisRoad(int carOnThisRoad) {
-        this.carOnThisRoad = carOnThisRoad;
+    public void setAddedsignx(int addedsignx, boolean sign) {
+        this.addedsignx[addedsignx] =sign;
     }
 
-    public int getEndx() {
-        return endx;
+    public boolean[] getAddedsigny() {
+        return addedsigny;
     }
 
-    public void setEndx(int endx) {
-        this.endx = endx;
-    }
-
-    public int getEndy() {
-        return endy;
-    }
-
-    public void setEndy(int endy) {
-        this.endy = endy;
+    public void setAddedsigny(int addedsigny, boolean sign) {
+        this.addedsigny[addedsigny] =sign;
     }
 
     public int getCurrentx() {
@@ -183,6 +170,22 @@ public class Car {
         this.currentx = currentx;
     }
 
+    public int[] getAddedx() {
+        return addedx;
+    }
+
+    public void addAddedx(int addedx, int index) {
+        this.addedx[index]=addedx;
+    }
+
+    public int[] getAddedy() {
+        return addedy;
+    }
+
+    public void addAddedy(int addedy, int index) {
+        this.addedy[index]=addedy;
+    }
+
     public int getCurrenty() {
         return currenty;
     }
@@ -191,21 +194,23 @@ public class Car {
         this.currenty = currenty;
     }
 
+    public int getDriveTo() {
+        return driveTo;
+    }
+
+    public void setDriveTo(int driveTo) {
+        this.driveTo = driveTo;
+    }
+
     public int getTrafficx() {
         return trafficx;
     }
 
-    public void setTrafficx(int trafficx) {
-        this.trafficx = trafficx;
-    }
 
     public int getTrafficy() {
         return trafficy;
     }
 
-    public void setTrafficy(int trafficy) {
-        this.trafficy = trafficy;
-    }
 
     public boolean isAfterTraffic() {
         return afterTraffic;
@@ -235,29 +240,6 @@ public class Car {
         this.sendOnTraffic = sendOnTraffic;
     }
 
-    public boolean isSendAfterTraffic() {
-        return sendAfterTraffic;
-    }
-
-    public void setSendAfterTraffic(boolean sendAfterTraffic) {
-        this.sendAfterTraffic = sendAfterTraffic;
-    }
-
-    public int getBeforeNextCarx() {
-        return beforeNextCarx;
-    }
-
-    public void setBeforeNextCarx(int beforeNextCarx) {
-        this.beforeNextCarx = beforeNextCarx;
-    }
-
-    public int getBeforeNextCary() {
-        return beforeNextCary;
-    }
-
-    public void setBeforeNextCary(int beforeNextCary) {
-        this.beforeNextCary = beforeNextCary;
-    }
 
     public double getWaitTime() {
         return waitTime;
@@ -269,6 +251,32 @@ public class Car {
         }else{
             this.startWaiting=waitTime;
             timeIsSet=true;
+        }
+    }
+
+    public int getCarMoved() {
+        return carMoved;
+    }
+
+    public void addCarMoved() {
+        this.carMoved++;
+    }
+    public void subCarMoved() {
+        this.carMoved--;
+    }
+
+    public int getCenterx(){
+        if(driveTo==0 || driveTo==2){
+            return currentx+20;
+        }else{
+            return currentx+25;
+        }
+    }
+    public int getCentery(){
+        if(driveTo==0 || driveTo==2){
+            return currenty+25;
+        }else{
+            return currenty+20;
         }
     }
 }
