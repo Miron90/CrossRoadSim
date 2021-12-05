@@ -1,6 +1,7 @@
 package federates.GUI;
 
 import federates.Car.Car;
+import federates.SpecialCar.SpecialCar;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +27,6 @@ public class AWT {
     ArrayList<Car> carsOnEnd = new ArrayList<>();
     ArrayList<Car> carsOnCrossRoad = new ArrayList<>();
 
-    ArrayList<Integer> carsOnRoad = new ArrayList<>();
 
 
     public AWT(GUIFederate femab){
@@ -50,37 +50,25 @@ public class AWT {
     public void drawCar() {
         for (Car car: femab.carList) {
             if(!car.isAfterCrossRoad()) {
-                if (car.getRoadId() == 0 && !carsOnRoad1.contains(car) && !carsOnEnd.contains(car))
+                if (car.getRoadId() == 0 && !carsOnRoad1.contains(car)  && !car.isAfterTraffic())
                     carsOnRoad1.add(car);
-                else if (car.getRoadId() == 1 && !carsOnRoad2.contains(car) && !carsOnEnd.contains(car))
+                else if (car.getRoadId() == 1 && !carsOnRoad2.contains(car) && !car.isAfterTraffic())
                     carsOnRoad2.add(car);
-                else if (car.getRoadId() == 2 && !carsOnRoad3.contains(car) && !carsOnEnd.contains(car))
+                else if (car.getRoadId() == 2 && !carsOnRoad3.contains(car) && !car.isAfterTraffic())
                     carsOnRoad3.add(car);
-                else if (car.getRoadId() == 3 && !carsOnRoad4.contains(car) && !carsOnEnd.contains(car))
+                else if (car.getRoadId() == 3 && !carsOnRoad4.contains(car) && !car.isAfterTraffic())
                     carsOnRoad4.add(car);
             }
         }
     }
 
-    public void setCarsOnRoad(ArrayList<Integer> carOnRoadList) {
-        this.carsOnRoad=carOnRoadList;
-    }
+
 
 
     public class MyFrame extends Frame{
 
         MyCanvas myCanvas = new MyCanvas();
         public MyFrame(){
-            Button b = new Button("Click Here");
-            b.setBounds(50,100,80,30);
-            b.addActionListener(new ActionListener() {
-                public void actionPerformed (ActionEvent e) {
-                    for(int i=0;i<=trafficColor.size();i++) {
-                        changeTrafficLight(i);
-                    }
-                }
-            });
-            this.add(b);
             setSize(width,height);
             setResizable(false);
             drawRoads();
@@ -123,25 +111,151 @@ public class AWT {
             g.drawLine(paramx1-pivot, paramy1-pivot, paramx1-pivot, paramy1-3*pivot);
 
             drawSubLines(g);
+            System.out.println("cars on road 1 "+carsOnRoad1.size());
+            System.out.println("cars on road 2 "+carsOnRoad2.size());
+            System.out.println("cars on road 3 "+carsOnRoad3.size());
+            System.out.println("cars on road 4 "+carsOnRoad4.size());
+            System.out.println("cars on crossroad "+carsOnCrossRoad.size());
+            System.out.println("special cars "+femab.specialCarList.size());
+            System.out.println("cars on end "+carsOnEnd.size());
 
             for(int i=0;i<=trafficColor.size();i++) {
                 drawTrafficLight(i,g);
             }
             for(int i=0;i<carsOnRoad1.size();i++) {
+                System.out.println("cars on road 1");
+                System.out.println("cars of id "+carsOnRoad1.get(i).getCarId());
+                System.out.println("cars of road "+carsOnRoad1.get(i).getRoadId());
                 drawCar(g, carsOnRoad1.get(i),i);
             }
             for(int i=0;i<carsOnRoad2.size();i++) {
+                System.out.println("cars on road 2");
+                System.out.println("cars of id "+carsOnRoad2.get(i).getCarId());
+                System.out.println("cars of road "+carsOnRoad2.get(i).getRoadId());
                 drawCar(g, carsOnRoad2.get(i),i);
             }
             for(int i=0;i<carsOnRoad3.size();i++) {
+                System.out.println("cars on road 3");
+                System.out.println("cars of id "+carsOnRoad3.get(i).getCarId());
+                System.out.println("cars of road "+carsOnRoad3.get(i).getRoadId());
                 drawCar(g, carsOnRoad3.get(i),i);
             }
             for(int i=0;i<carsOnRoad4.size();i++) {
+                System.out.println("cars on road 4");
+                System.out.println("cars of id "+carsOnRoad4.get(i).getCarId());
+                System.out.println("cars of road "+carsOnRoad4.get(i).getRoadId());
                 drawCar(g, carsOnRoad4.get(i),i);
             }
             for(int i=0;i<carsOnEnd.size();i++) {
-                drawCar(g, carsOnEnd.get(i),i);
+                System.out.println("cars on road end");
+                System.out.println("cars of id "+carsOnEnd.get(i).getCarId());
+                System.out.println("cars of road "+carsOnEnd.get(i).getRoadId());
+                drawCarToEnd(g, carsOnEnd.get(i),i);
             }
+            for(int i=0;i<carsOnCrossRoad.size();i++) {
+                System.out.println("cars on road cross");
+                System.out.println("cars of id "+carsOnCrossRoad.get(i).getCarId());
+                System.out.println("cars of road "+carsOnCrossRoad.get(i).getRoadId());
+                drawCar(g, carsOnCrossRoad.get(i),i);
+            }
+            for(int i=0;i<femab.specialCarList.size();i++) {
+                drawSpecialCar(g, femab.specialCarList.get(i),i);
+            }
+        }
+
+        private void drawSpecialCar(Graphics g, SpecialCar specialCar, int i) {
+
+                    switch (specialCar.getRoadId()){
+                        case 0:
+                            if(specialCar.getRoadToGoId()==2){
+                                driveSpecialToRoad1(g, specialCar);
+                                specialCar.setCurrenty(specialCar.getCurrenty()+10);
+                            } else if(specialCar.getRoadToGoId()==3){
+                                if(specialCar.getCurrenty()>=580){
+                                    driveSpecialToRoad2(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx()-10);
+                                }else{
+                                    driveSpecialToRoad1(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty()+10);
+                                }
+                            }else if(specialCar.getRoadToGoId()==1){
+                                if (specialCar.getCurrenty() >= 585) {
+                                    driveSpecialToRoad4(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx() + 10);
+                                } else {
+                                    driveSpecialToRoad1(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty() + 10);
+                                }
+                            }
+
+                            break;
+                        case 1:
+                            if(specialCar.getRoadToGoId()==3){
+                                driveSpecialToRoad2(g, specialCar);
+                                specialCar.setCurrentx(specialCar.getCurrentx()-10);
+                            } else if(specialCar.getRoadToGoId()==0){
+                                if(specialCar.getCurrentx()<=585){
+                                    driveSpecialToRoad3(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty()-10);
+                                }else{
+                                    driveSpecialToRoad2(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx()-10);
+                                }
+                            }else if(specialCar.getRoadToGoId()==2){
+                                if(specialCar.getCurrentx()<=580){
+                                    driveSpecialToRoad1(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty()+10);
+                                }else{
+                                    driveSpecialToRoad2(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx()-10);
+                                }
+                            }
+                            break;
+                        case 2:
+                            if(specialCar.getRoadToGoId()==0){
+                                driveSpecialToRoad3(g, specialCar);
+                                specialCar.setCurrenty(specialCar.getCurrenty()-10);
+                            } else if(specialCar.getRoadToGoId()==1){
+                                if(specialCar.getCurrenty()<=585){
+                                    driveSpecialToRoad4(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx()+10);
+                                }else{
+                                    driveSpecialToRoad3(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty()-10);
+                                }
+                            }else if(specialCar.getRoadToGoId()==3){
+                                if(specialCar.getCurrenty()<=580){
+                                    driveSpecialToRoad2(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx()-10);
+                                }else{
+                                    driveSpecialToRoad3(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty()-10);
+                                }
+                            }
+                            break;
+                        case 3:
+                            if(specialCar.getRoadToGoId()==1){
+                                driveSpecialToRoad4(g, specialCar);
+                                specialCar.setCurrentx(specialCar.getCurrentx()+10);
+                            } else if(specialCar.getRoadToGoId()==2){
+                                if(specialCar.getCurrentx()>=580){
+                                    driveSpecialToRoad1(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty()+10);
+                                }else{
+                                    driveSpecialToRoad4(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx()+10);
+                                }
+                            }else if(specialCar.getRoadToGoId()==0){
+                                if(specialCar.getCurrentx()>=585){
+                                    driveSpecialToRoad3(g, specialCar);
+                                    specialCar.setCurrenty(specialCar.getCurrenty()-10);
+                                }else{
+                                    driveSpecialToRoad4(g, specialCar);
+                                    specialCar.setCurrentx(specialCar.getCurrentx()+10);
+                                }
+                            }
+                            break;
+                    }
         }
 
         private void drawSubLines(Graphics g) {
@@ -250,20 +364,115 @@ public class AWT {
         }
 
 
+        public void drawCarToEnd(Graphics g, Car car, int carOfNumber) {
 
+                switch (car.getRoadId()){
+                    case 0:
+                        if(car.getRoadToGo()==2){
+                            driveToRoad1(g, car);
+                            car.setCurrenty(car.getCurrenty()+3);
+                        } else if(car.getRoadToGo()==3){
+                            if(car.getCurrenty()>=535){
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-3);
+                            }else{
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty()+3);
+                            }
+                        }else if(car.getRoadToGo()==1){
+                            if (car.getCurrenty() >= 610) {
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx() + 3);
+                            } else {
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty() + 3);
+                            }
+                        }
+
+                        break;
+                    case 1:
+                        if(car.getRoadToGo()==3){
+                            driveToRoad2(g, car);
+                            car.setCurrentx(car.getCurrentx()-3);
+                        } else if(car.getRoadToGo()==0){
+                            if(car.getCurrentx()<=610){
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-3);
+                            }else{
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-3);
+                            }
+                        }else if(car.getRoadToGo()==2){
+                            if(car.getCurrentx()<=535){
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty()+3);
+                            }else{
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-3);
+                            }
+                        }
+                        break;
+                    case 2:
+                        if(car.getRoadToGo()==0){
+                            driveToRoad3(g, car);
+                            car.setCurrenty(car.getCurrenty()-3);
+                        } else if(car.getRoadToGo()==1){
+                            if(car.getCurrenty()<=610){
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx()+3);
+                            }else{
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-3);
+                            }
+                        }else if(car.getRoadToGo()==3){
+                            if(car.getCurrenty()<=535){
+                                driveToRoad2(g, car);
+                                car.setCurrentx(car.getCurrentx()-3);
+                            }else{
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-3);
+                            }
+                        }
+                        break;
+                    case 3:
+                        if(car.getRoadToGo()==1){
+                            driveToRoad4(g, car);
+                            car.setCurrentx(car.getCurrentx()+3);
+                        } else if(car.getRoadToGo()==2){
+                            if(car.getCurrentx()>=535){
+                                driveToRoad1(g, car);
+                                car.setCurrenty(car.getCurrenty()+3);
+                            }else{
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx()+3);
+                            }
+                        }else if(car.getRoadToGo()==0){
+                            if(car.getCurrentx()>=610){
+                                driveToRoad3(g, car);
+                                car.setCurrenty(car.getCurrenty()-3);
+                            }else{
+                                driveToRoad4(g, car);
+                                car.setCurrentx(car.getCurrentx()+3);
+                            }
+                        }
+                        break;
+                }
+        }
 
 
         public void drawCar(Graphics g, Car car, int carOfNumber) {
             //car.nowx+=1;
+
             for (int i=0;i<carsOnCrossRoad.size();i++) {
                 if((carsOnCrossRoad.get(i).getCurrentx()<450 || carsOnCrossRoad.get(i).getCurrentx()>750) || (carsOnCrossRoad.get(i).getCurrenty()<450 || carsOnCrossRoad.get(i).getCurrenty()>750)){
+                    carsOnEnd.add(carsOnCrossRoad.get(i));
                     carsOnCrossRoad.remove(carsOnCrossRoad.get(i));
                 }
             }
             for (int i=0;i<carsOnEnd.size();i++) {
                 if((carsOnEnd.get(i).getCurrentx()<-60 || carsOnEnd.get(i).getCurrentx()>1260) || (carsOnEnd.get(i).getCurrenty()<-60 || carsOnEnd.get(i).getCurrenty()>1260)){
-                    carsOnEnd.remove(carsOnEnd.get(i));
                     femab.carList.get(carsOnEnd.get(i).getCarId()).setAfterCrossRoad(true);
+                    carsOnEnd.remove(carsOnEnd.get(i));
                 }
             }
             if(car.isOnTraffic()) {
@@ -411,9 +620,9 @@ public class AWT {
                                     carsOnRoad1.remove(car);
                                 }
                             }else if(car.getRoadToGo()==1){
-                                if(carsOnRoad3.size()>0&&(carsOnRoad3.get(0).getRoadToGo()==0||carsOnRoad3.get(0).getRoadToGo()==1) &&carsOnRoad3.get(0).getCurrenty()<950){
-                                    driveToRoad1(g, car);
-                                }else{
+//                                if(carsOnRoad3.size()>0&&(carsOnRoad3.get(0).getRoadToGo()==0||carsOnRoad3.get(0).getRoadToGo()==1) &&carsOnRoad3.get(0).getCurrenty()<950){
+//                                    driveToRoad1(g, car);
+//                                }else{
                                     if(car.getCurrenty()>=610){
                                         driveToRoad4(g, car);
                                         car.setCurrentx(car.getCurrentx()+6);
@@ -425,7 +634,7 @@ public class AWT {
                                         ChangeState(car);
                                         carsOnRoad1.remove(car);
                                     }
-                                }
+//                                }
                             }
                         }else{
                             driveToRoad1(g, car);
@@ -451,9 +660,9 @@ public class AWT {
                                     carsOnRoad2.remove(car);
                                 }
                             }else if(car.getRoadToGo()==2){
-                                if(carsOnRoad4.size()>0&&(carsOnRoad4.get(0).getRoadToGo()==1||carsOnRoad3.get(0).getRoadToGo()==2) &&carsOnRoad3.get(0).getCurrentx()>350){
-                                    driveToRoad2(g, car);
-                                }else{
+//                                if(carsOnRoad4.size()>0&& carsOnRoad3.size()>0&&(carsOnRoad4.get(0).getRoadToGo()==1||carsOnRoad3.get(0).getRoadToGo()==2) &&carsOnRoad3.get(0).getCurrentx()>350){
+//                                    driveToRoad2(g, car);
+//                                }else{
                                     if(car.getCurrentx()<=535){
                                         driveToRoad3(g, car);
                                         car.setCurrenty(car.getCurrenty()+6);
@@ -465,7 +674,7 @@ public class AWT {
                                         ChangeState(car);
                                         carsOnRoad2.remove(car);
                                     }
-                                }
+//                                }
                             }
                         }else{
                             driveToRoad2(g, car);
@@ -514,6 +723,7 @@ public class AWT {
                                 car.setCurrentx(car.getCurrentx()+6);
                                 ChangeState(car);
                                 carsOnRoad4.remove(car);
+
                             } else if(car.getRoadToGo()==2){
                                 if(car.getCurrentx()>=535){
                                     driveToRoad1(g, car);
@@ -673,20 +883,110 @@ public class AWT {
         }
         public void ChangeState(Car car){
             car.setOnTraffic(false);
+            car.setInQueue(false);
+            car.setWaitTime(femab.getTime());
             femab.carList.get(car.getCarId()).setInQueue(false);
             femab.carList.get(car.getCarId()).setOnTraffic(false);
             femab.carList.get(car.getCarId()).setWaitTime(femab.getTime());
             car.setAfterTraffic(true);
             femab.carList.get(car.getCarId()).setAfterTraffic(true);
-            if(car.getRoadId()==0 && car.getRoadToGo()!=3 && !carsOnCrossRoad.contains(car)) {
+            if(!carsOnCrossRoad.contains(car)) {
                 carsOnCrossRoad.add(car);
             }
-            if(car.getRoadId()-1!=car.getRoadToGo() && car.getRoadId()!=0 && !carsOnCrossRoad.contains(car)) {
-                carsOnCrossRoad.add(car);
+//            if(car.getRoadId()==0 && car.getRoadToGo()!=3 && !carsOnCrossRoad.contains(car)) {
+//                carsOnCrossRoad.add(car);
+//            }
+//            if(car.getRoadId()-1!=car.getRoadToGo() && car.getRoadId()!=0 && !carsOnCrossRoad.contains(car)) {
+//                carsOnCrossRoad.add(car);
+//            }
+//            if(!carsOnEnd.contains(car) && (car.getCurrentx()<500 || car.getCurrentx()>700) || (car.getCurrenty()<400 || car.getCurrenty()>700)) {
+//                carsOnEnd.add(car);
+//            }
+        }
+        public void driveSpecialToRoad1(Graphics g, SpecialCar car){
+            g.setColor(Color.BLACK);
+            g.fillOval(car.getCurrentx()-3, car.getCurrenty(),6,6);
+            g.fillOval(car.getCurrentx()-3, car.getCurrenty()+34,6,6);
+            g.fillOval(car.getCurrentx()+27, car.getCurrenty(),6,6);
+            g.fillOval(car.getCurrentx()+27, car.getCurrenty()+34,6,6);
+            g.setColor(Color.RED);
+            g.fillRect(car.getCurrentx(), car.getCurrenty(), 30,40);
+            g.setColor(Color.YELLOW);
+            g.fillRect(car.getCurrentx()+7, car.getCurrenty()+30, 15,7);
+            g.setColor(Color.BLUE);
+            if(car.isSpin()) {
+                g.setColor(Color.BLUE);
+                g.fillRect(car.getCurrentx() + 13, car.getCurrenty() + 18, 3, 6);
+                car.setSpin(false);
+            }else{
+                g.setColor(Color.YELLOW);
+                g.fillRect(car.getCurrentx() + 14, car.getCurrenty() + 17, 6, 3);
+                car.setSpin(true);
             }
-            if(!carsOnEnd.contains(car)) {
-                carsOnEnd.add(car);
+            g.setColor(Color.BLACK);
+        }
+        public void driveSpecialToRoad2(Graphics g, SpecialCar car){
+            g.setColor(Color.BLACK);
+            g.fillOval(car.getCurrentx()+3, car.getCurrenty()-3,6,6);
+            g.fillOval(car.getCurrentx()+34, car.getCurrenty()-3,6,6);
+            g.fillOval(car.getCurrentx()+3, car.getCurrenty()+27,6,6);
+            g.fillOval(car.getCurrentx()+34, car.getCurrenty()+27,6,6);
+            g.setColor(Color.RED);
+            g.fillRect(car.getCurrentx(), car.getCurrenty(), 40,30);
+            g.setColor(Color.YELLOW);
+            g.fillRect(car.getCurrentx()+3, car.getCurrenty()+7, 7,15);
+            if(car.isSpin()) {
+                g.setColor(Color.BLUE);
+                g.fillRect(car.getCurrentx() + 18, car.getCurrenty() + 13, 3, 6);
+                car.setSpin(false);
+            }else{
+                g.setColor(Color.YELLOW);
+                g.fillRect(car.getCurrentx() + 17, car.getCurrenty() + 14, 6, 3);
+                car.setSpin(true);
             }
+            g.setColor(Color.BLACK);
+        }
+        public void driveSpecialToRoad3(Graphics g, SpecialCar car){
+            g.setColor(Color.BLACK);
+            g.fillOval(car.getCurrentx()-3, car.getCurrenty()+3,6,6);
+            g.fillOval(car.getCurrentx()-3, car.getCurrenty()+34,6,6);
+            g.fillOval(car.getCurrentx()+27, car.getCurrenty()+3,6,6);
+            g.fillOval(car.getCurrentx()+27, car.getCurrenty()+34,6,6);
+            g.setColor(Color.RED);
+            g.fillRect(car.getCurrentx(), car.getCurrenty(), 30,40);
+            g.setColor(Color.YELLOW);
+            g.fillRect(car.getCurrentx()+7, car.getCurrenty()+3, 15,7);
+            if(car.isSpin()) {
+                g.setColor(Color.BLUE);
+                g.fillRect(car.getCurrentx() + 13, car.getCurrenty() + 18, 3, 6);
+                car.setSpin(false);
+            }else{
+                g.setColor(Color.YELLOW);
+                g.fillRect(car.getCurrentx() + 14, car.getCurrenty() + 17, 6, 3);
+                car.setSpin(true);
+            }
+            g.setColor(Color.BLACK);
+        }
+        public void driveSpecialToRoad4(Graphics g, SpecialCar car){
+            g.setColor(Color.BLACK);
+            g.fillOval(car.getCurrentx()+3, car.getCurrenty()-3,6,6);
+            g.fillOval(car.getCurrentx()+3, car.getCurrenty()+27,6,6);
+            g.fillOval(car.getCurrentx()+34, car.getCurrenty()-3,6,6);
+            g.fillOval(car.getCurrentx()+34, car.getCurrenty()+27,6,6);
+            g.setColor(Color.RED);
+            g.fillRect(car.getCurrentx(), car.getCurrenty(), 40,30);
+            g.setColor(Color.YELLOW);
+            g.fillRect(car.getCurrentx()+30, car.getCurrenty()+7, 7,15);
+            if(car.isSpin()) {
+                g.setColor(Color.BLUE);
+                g.fillRect(car.getCurrentx() + 18, car.getCurrenty() + 13, 3, 6);
+                car.setSpin(false);
+            }else{
+                g.setColor(Color.YELLOW);
+                g.fillRect(car.getCurrentx() + 17, car.getCurrenty() + 13, 6, 3);
+                car.setSpin(true);
+            }
+            g.setColor(Color.BLACK);
         }
     }
 }

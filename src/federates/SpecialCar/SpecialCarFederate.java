@@ -1,6 +1,7 @@
 package federates.SpecialCar;
 
 
+import federates.Car.Car;
 import federates.GUI.AWT;
 import helpers.BaseFederate;
 import hla.rti1516e.*;
@@ -37,6 +38,11 @@ public class SpecialCarFederate extends BaseFederate{
     private HLAfloat64TimeFactory timeFactory;
     protected EncoderFactory encoderFactory;
 
+    protected ObjectClassHandle specialCarHandle;
+    protected AttributeHandle specialCarIdHandle;
+    protected AttributeHandle specialCarRoadIdHandle;
+    protected AttributeHandle specialCarRoadToGoIdHandle;
+    private int specialCars;
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -131,6 +137,8 @@ public class SpecialCarFederate extends BaseFederate{
         {
             rtiamb.evokeMultipleCallbacks( 0.1, 0.2 );
         }
+        boolean carSpawned=false;
+        double timeSpawned=-999;
 
         /////////////////////////////
         // 7. enable time policies //
@@ -159,12 +167,25 @@ public class SpecialCarFederate extends BaseFederate{
 
         while( fedamb.federateTime<SIM_TIME )
         {
+            if(rand.nextInt(SPECIAL_CAR_SPAWN_RATE)==0 && !carSpawned && timeSpawned+120<fedamb.federateTime){
+                ObjectInstanceHandle specialCarObjectHandle = rtiamb.registerObjectInstance(specialCarHandle);
+                //carList.add();
+                updateSpecialCar(new SpecialCar(specialCars, specialCarObjectHandle, rand.nextInt(4)));
+                specialCars++;
+                carSpawned=true;
+                log("Registered Special Car, handle=" + specialCarObjectHandle);
+            }
+            if(carSpawned){
+                timeSpawned=fedamb.federateTime;
+                carSpawned=false;
+            }
 
 
 
             double minTime=INFINITY;
+
             if(minTime==INFINITY | minTime>10) minTime=randomTime();
-            advanceTime(minTime);
+            advanceTime(3);
             log( "Time Advanced to " + fedamb.federateTime );
         }
 
@@ -200,9 +221,20 @@ public class SpecialCarFederate extends BaseFederate{
         }
     }
 
+    private void updateSpecialCar(SpecialCar specialCar) throws NotConnected, FederateNotExecutionMember, ObjectInstanceNotKnown, RestoreInProgress, AttributeNotOwned, AttributeNotDefined, SaveInProgress, RTIinternalError {
+        AttributeHandleValueMap attributes = rtiamb.getAttributeHandleValueMapFactory().create(3);
 
+        HLAinteger32BE carId = encoderFactory.createHLAinteger32BE( specialCar.getId());
+        attributes.put( this.specialCarIdHandle, carId.toByteArray() );
 
+        HLAinteger32BE carRoadId = encoderFactory.createHLAinteger32BE( specialCar.getRoadId() );
+        attributes.put( this.specialCarRoadIdHandle, carRoadId.toByteArray() );
 
+        HLAinteger32BE carRoadToGoId = encoderFactory.createHLAinteger32BE( specialCar.getRoadToGoId() );
+        attributes.put( this.specialCarRoadToGoIdHandle, carRoadToGoId.toByteArray() );
+
+        rtiamb.updateAttributeValues( specialCar.getObjectId(), attributes, generateTag() );
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -257,7 +289,17 @@ public class SpecialCarFederate extends BaseFederate{
     private void publishAndSubscribe() throws RTIexception
     {
 ////		publish ProductsStrorage object
+        this.specialCarHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.SpecialCar");
+        this.specialCarIdHandle = rtiamb.getAttributeHandle(this.specialCarHandle,"carId");
+        this.specialCarRoadIdHandle = rtiamb.getAttributeHandle(this.specialCarHandle,"roadId");
+        this.specialCarRoadToGoIdHandle = rtiamb.getAttributeHandle(this.specialCarHandle,"roadToGo");
 
+        AttributeHandleSet attributes = rtiamb.getAttributeHandleSetFactory().create();
+        attributes.add( this.specialCarIdHandle );
+        attributes.add( this.specialCarRoadIdHandle );
+        attributes.add( this.specialCarRoadToGoIdHandle );
+
+        rtiamb.publishObjectClassAttributes( this.specialCarHandle, attributes );
 
     }
 

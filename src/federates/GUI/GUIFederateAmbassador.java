@@ -2,6 +2,7 @@ package federates.GUI;
 
 import federates.Car.Car;
 import federates.Road.Road;
+import federates.SpecialCar.SpecialCar;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.DecoderException;
 import hla.rti1516e.encoding.HLAinteger32BE;
@@ -39,6 +40,7 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
 
     List<ObjectInstanceHandle> roadList = new ArrayList<>();
     List<ObjectInstanceHandle> carList = new ArrayList<>();
+    List<ObjectInstanceHandle> specialCarList = new ArrayList<>();
 
     //----------------------------------------------------------
     //                      CONSTRUCTORS
@@ -125,6 +127,8 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
             roadList.add(theObject);
         if(federate.carHandle.equals(theObjectClass))
             carList.add(theObject);
+        if(federate.specialCarHandle.equals(theObjectClass))
+            specialCarList.add(theObject);
     }
 
     @Override
@@ -251,6 +255,46 @@ public class GUIFederateAmbassador extends NullFederateAmbassador {
             }
             federate.carList.add(new Car(carId.getValue(), roadId.getValue(),roadToGoId.getValue(), federate.carOnRoadList.get(roadId.getValue()), federateTime));
             federate.carOnRoadList.set(roadId.getValue(),federate.carOnRoadList.get(roadId.getValue())+1);
+            builder.append("\n");
+        }else if(specialCarList.contains(theObject)){
+            HLAinteger32BE specialCarId = new HLA1516eInteger32BE();
+            HLAinteger32BE roadId = new HLA1516eInteger32BE();
+            HLAinteger32BE roadToGoId = new HLA1516eInteger32BE();
+            for( AttributeHandle attributeHandle : theAttributes.keySet() ) {
+                // print the attibute handle
+                builder.append("\tattributeHandle=").append(attributeHandle);
+                if (attributeHandle.equals(federate.specialCarIdHandle)) {
+                    builder.append(" (specialCarId)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        specialCarId.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(specialCarId.getValue());
+
+                } else if (attributeHandle.equals(federate.specialCarRoadHandle)) {
+                    builder.append(" (specialCarRoad)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        roadId.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(roadId.getValue());
+                }else if (attributeHandle.equals(federate.specialCarRoadToGoHandle)) {
+                    builder.append(" (specialCarRoadToGo)    ");
+                    builder.append(", attributeValue=");
+                    try {
+                        roadToGoId.decode(theAttributes.get(attributeHandle));
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
+                    }
+                    builder.append(roadToGoId.getValue());
+                }
+
+            }
+            federate.specialCarList.add(new SpecialCar(specialCarId.getValue(), roadId.getValue(),roadToGoId.getValue()));
             builder.append("\n");
         }
 

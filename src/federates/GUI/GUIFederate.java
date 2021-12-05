@@ -3,6 +3,7 @@ package federates.GUI;
 
 import federates.Car.Car;
 import federates.Road.Road;
+import federates.SpecialCar.SpecialCar;
 import helpers.BaseFederate;
 import hla.rti1516e.*;
 import hla.rti1516e.encoding.EncoderFactory;
@@ -47,6 +48,11 @@ public class GUIFederate extends BaseFederate{
     protected AttributeHandle carRoadHandle;
     protected AttributeHandle carRoadToGoHandle;
 
+    protected ObjectClassHandle specialCarHandle;
+    protected AttributeHandle specialCarIdHandle;
+    protected AttributeHandle specialCarRoadHandle;
+    protected AttributeHandle specialCarRoadToGoHandle;
+
     protected InteractionClassHandle carEndWaitInTrafficHandle;
     protected InteractionClassHandle carWaitInTrafficHandle;
 
@@ -54,6 +60,7 @@ public class GUIFederate extends BaseFederate{
 
     ArrayList<Road> roadList = new ArrayList<>();
     ArrayList<Car> carList = new ArrayList<>();
+    ArrayList<SpecialCar> specialCarList = new ArrayList<>();
     ArrayList<Integer> carOnRoadList = new ArrayList<>();
 
 
@@ -198,7 +205,6 @@ public class GUIFederate extends BaseFederate{
                 }
             }
             Gui.drawCar();
-            Gui.setCarsOnRoad(carOnRoadList);
             Gui.myFrame.myCanvas.repaint();
             double minTime=1;
             advanceTime(minTime);
@@ -361,6 +367,18 @@ public class GUIFederate extends BaseFederate{
         carAttributes.add( this.carRoadToGoHandle );
 
         rtiamb.subscribeObjectClassAttributes( this.carHandle, carAttributes );
+
+        this.specialCarHandle = rtiamb.getObjectClassHandle("HLAobjectRoot.SpecialCar");
+        this.specialCarIdHandle = rtiamb.getAttributeHandle(this.specialCarHandle,"carId");
+        this.specialCarRoadHandle = rtiamb.getAttributeHandle(this.specialCarHandle,"roadId");
+        this.specialCarRoadToGoHandle = rtiamb.getAttributeHandle(this.specialCarHandle,"roadToGo");
+
+        AttributeHandleSet specialCarAttributes = rtiamb.getAttributeHandleSetFactory().create();
+        specialCarAttributes.add( this.specialCarIdHandle );
+        specialCarAttributes.add( this.specialCarRoadHandle );
+        specialCarAttributes.add( this.specialCarRoadToGoHandle );
+
+        rtiamb.subscribeObjectClassAttributes( this.specialCarHandle, specialCarAttributes );
 
         this.carEndWaitInTrafficHandle = rtiamb.getInteractionClassHandle("HLAinteractionRoot.EndCarWaitingOnTraffic" );
         rtiamb.publishInteractionClass(this.carEndWaitInTrafficHandle);
